@@ -1,0 +1,9 @@
+@startuml
+
+Eth_30_Enet_Irq.c -> Eth_30_Enet_IrqHandler.c: ETH中断调用Eth_30_Enet_ProcessIsr 
+Eth_30_Enet_IrqHandler.c -> Eth_30_Enet_LL_IrqHandler.c: Eth_30_Enet_RxIrqHdlrQ0
+Eth_30_Enet_LL_IrqHandler.c -> Eth_30_Enet.c: Eth_30_Enet_Internal_Receive
+Eth_30_Enet.c -> Eth_30_Enet.c: Eth_30_Enet_Receive_ProcessValidFrame
+Eth_30_Enet -> EthIf_Rx.c: EthIf_RxIndication:
+@enduml
+
