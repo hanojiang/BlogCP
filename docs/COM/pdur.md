@@ -185,6 +185,8 @@ PDUR模块的接收操作始终由来自下层模块（通信接口模块或传�
 
 由于PDUR模块不会缓冲此I-PDU，因此它不必拒绝长于或短于配置的I-PDU。
 
+![pudr-09](./images/pudr-09.png)
+
 ##### 7.1.1.2 传输协议
 
 对于传输协议模块，当接收到首帧FF或单帧SF时，PDUR模块首先被通知开始接收提醒。通过调用`<Up_StartOfReception>`提醒上层模块。通过后续的`<Lo>_CopyRxData`调用将payload的每一个片段(NPDU)copy到目的上层模块。
@@ -205,6 +207,8 @@ PDUR模块的接收操作始终由来自下层模块（通信接口模块或传�
 > **[SWS_PduR_00429]**：当源传输协议模块调用`PduR_<User-LoTp>RxIndication`指示接收到完整的I-PDU时，PDUR模块应通过调用`<Up>_TpRxIndication`将指示转发到目标上层模块。
 
 > **[SWS_PduR_00207]**：如果源传输协议模块使用`PduR_<UserLoTp>RxIndication`报告错误，则PDUR模块除将指示转发到上层模块外不应执行任何错误处理。
+
+![pudr-10](./images/pudr-10.png)
 
 ###### 7.1.1.2.1 处理未知长度的I-PDU
 
@@ -246,8 +250,16 @@ PDUR模块的发送操作由来自源上层源模块的PDU发送请求触发，�
 I-PDU可以通过三种方式在通信接口上传输：
 
 1. Direct data provision：上层模块调用`PduR_<User:Up>Transmit`后，PDUR模块进一步调用`<Lo>_Transmit`，数据被底层通信接口模块拷贝。
+
+![pudr-04](./images/pudr-04.png)
+
 2. Trigger transmit provision：当底层模块调用`PduR_<User:Lo>TriggerTransmit`请求传输I-PDU时，PDUR模块进一步调用`<Up>_TriggerTransmit`，数据被上层模块拷贝。
+
+![pudr-05](./images/pudr-05.png)
+
 3. 上层模块调用`PduR_<User:Up>Transmit`后，PDUR模块进一步调用`<Lo>_Transmit`，但数据没有被底层模块拷贝，而是当底层调用`PduR_<User:Lo>TriggerTransmit`时请求到数据。
+
+![pudr-06](./images/pudr-06.png)
 
 I-PDU的传输确认，对于直接和触发传输数据的规定是相同的。
 
@@ -282,22 +294,56 @@ PDU路由器模块将不会检查传输请求是否包含单个N-PDU（SF）或�
 > **[SWS_PduR_00301]**：对于单播，PUDR模块应当转发底层传输协议模块的`PduR_<User:LoTp>TxConfirmation`给上层模块，通过`<Up>_TpTxConfirmation`。
 > **[SWS_PduR_00432]**：对于单播，当调用`<Lo>_Transmit`后，PDUR模块应当返回相同的返回值给源上层模块调用的`PduR_<User:Up>Transmit`。
 
+![pudr-07](./images/pudr-07.png)
+
 ###### 7.1.2.3.1 多播发送
 
 本小节包含使用传输协议模块对I-PDU进行多播传输的特定要求。由于在PDUR模块中进行了1：n，n> 1路由，因此PDU路由器模块必须多次向源上层模块请求相同的数据。另外，必须特别处理多播的确认。
 
 由于上层将多次复制同一数据，因此PDUR将使用`RetryInfoPtr`多次查询同一数据`RetryInfoPtr`包含一个称为`TpDataState`的状态类型。
 
-> **[SWS_PduR_00631]**：
-> **[SWS_PduR_00632]**：
-> **[SWS_PduR_00812]**：
-> **[SWS_PduR_00765]**：
+> **[SWS_PduR_00631]**：传输过程中，第一个目的底层模块的`PduR_<User:LoTp>CopyTxData`请求应当带参数`TpDataState=TP_CONFPENDING`转发。
+> **[SWS_PduR_00632]**：接下来的`PduR_<User:LoTp>CopyTxData`请求应当带参数`TP_DATARETRY`转发，为了相同的数据拷贝。
+> **[SWS_PduR_00812]**：在所有传输协议接收到它们的数据之后，PDUR模块可以向上层模块发送确认数据。
+> **[SWS_PduR_00765]**：对于多播传输，则在从下层传输协议模块接收到最后一个`PduR_<User:LoTp>TxConfirmation`后，PDUR模块应使用`<Up>_TpTxConfirmation`通知上层模块。如果至少一个`PduR_<User:LoTp>TxConfirmation`报告了`E_OK`，则结果参数应为`E_OK`。
+
+![pudr-08](./images/pudr-08.png)
 
 ###### 7.1.2.3.2 错误处理
 
+PDUR模块将不会对发生的错误采取特定的措施，这些错误将转发到源上层模块。上层模块负责适当的错误处理。
+
 ###### 7.1.2.3.3 处理未知长度的I-PDU
 
+PduR能够使用TP API处理未知长度的I-PDU（即数据流类型）。未知长度的定义由`TpSduLength = 0`表示。
+
+> **[SWS_PduR_00822]**：本地传输场景中，`PduR_<User:Up>Transmit`带参数`PduInfoType.SduLength=0`被调用，I-PDU被路由到TP模块，PDUR应当带参数`PduInfoType.SduLength=0`调用所有TP模块的`<LoTp>_Transmit`。
+
 #### 7.1.3 I-PDU网关
+
+PDUR模块支持I-PDU从一个源总线到一个或多个目标总线的网关。与从/向本地模块进行发送和接收的区别在于，PDU路由器模块必须同时是接收器和发送器，并且在某些情况下还为I-PDU提供缓冲。
+
+特意隔离网关要求，以在不需要网关的情况下有效实现PDUR模块。如果PDUR模块允许I-PDU的网关，则这些要求被视为附加要求，而不是替代以前的要求。
+
+下面的列表给出网关的特征总览：
+
+- I-PDU可以从源通信接口模块网关到一个（1：1）或多个目标通信接口模块（1：n I-PDU网关）
+    - 对于每一个目的地，PDUR模块可通过可配置深度，缓存每一路的I-PDU(例如FIFO)
+    - 一个I-PDU可能在被上层模块接受的同时，被网关到n个目的通信接口模块。
+- 通过TP传输的I-PDU可能被网关到一个或多个目的TP模块。
+    - 单帧或多帧可能被网关到多个目的TP模块或本地模块(如DCM)
+    - 多个N-PDU组成的I-PDU可能通过"on-the-fly gatewaying"的方式被网关到目的地，这意味着在开始传输之前不需要接收到完整的I-PDU。
+    - 多个N-PDU组成的I-PDU可能被网关到其他的TP模块或本地模块，但两者不能同时具备。
+    - 通过TP模块传输的I-PDU可能被FIFO缓存。这适用于单帧和多帧。
+- I-PDU只能仅在TP模块或If模块间路由，而不能混合路由，如，通过CanIf接收到的I-PDU不能被网关到LinTp。
+
+PDUR模块应当将从一个底层模块(源网络)接收到的I-PDU转发到另一个底层模块(目标网络)，该I-PDU通过ID标识。
+
+> **[SWS_PduR_00638]**：I-PDU只能被网关到其他的TP模块或本地模块，但两者不能同时具备。
+> **[SWS_PduR_00825]**：
+> **[SWS_PduR_00826]**：
+> **[SWS_PduR_00827]**：
+> **[SWS_PduR_00829]**：
 
 ##### 7.1.3.1 通信接口模块
 
