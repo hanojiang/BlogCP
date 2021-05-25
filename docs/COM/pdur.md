@@ -347,9 +347,70 @@ PDUR模块应当将从一个底层模块(源网络)接收到的I-PDU转发到另
 
 ##### 7.1.3.1 通信接口模块
 
+I-PDU可以被一个通信接口接收并网关到n个通信接口，对于网关功能而言，可以为每一路目的通信接口配置FIFO，而不需要对本地模块进行配置。
+
+> **[SWS_PduR_00436]**：PDUR模块应当支持I-PDU在一个源通信接口模块和一个或多个目的通信接口模块间路由。
+> **[SWS_PduR_00437]**：PDUR模块应当支持I-PDU在两个通信接口间的立即传输(无需PDUR模块生成速率)。
+
+两个通信接口间的I-PDU路由不支持速率转换，这个功能可以由Com模块Signal网关实现。在这种场景下，I-PDU必须路由到Com模块。
+
+取决于目的接口模块，I-PDU路由有两种方式。使用哪种方式有配置控制：
+
+- > **[SWS_PduR_00303]**：Direct data provision，目的I-PDU的PduRDestPduDataProvision配置为PDUR_DIRECT。当`<DstLo>_Transmit`被调用后，`<DstLo> module`执行数据拷贝，PDUR模块不会缓存发送的I-PDU。
+- > **[SWS_PduR_00306]**：Trigger transmit data provision，目的I-PDU的PduRDestPduDataProvision配置为PDUR_TRIGGERTRANSMIT。当`<DstLo>_Transmit`被调用后，`<DstLo> module`不执行数据拷贝，PDUR模块应当缓存发送的I-PDU，直到`<DstLo> module`调用`PduR_<DstLo>TriggerTransmit`。
+
+> **[SWS_PduR_00809]**：当缓存策略为last-is-best buffering，在Trigger transmit data provision时，PDUR模块缓存最后到达的I-PDU。
+
+Trigger transmit data provision下，I-PDU必须被缓存的原因是目的通信接口可能根据调度周期发送I-PDU，然后通信接口模块直接调用`PduR_<DstLo>TriggerTransmit`，而不需要前期的`<DstLo>_Transmit`调用。
+
+> **[SWS_PduR_00662]**：当使用FIFO buffer时，如果目的通信接口模块通过`PduR_<DstLo>TriggerTransmit`接口请求I-PDU buffer，如果FIFO是空的，则接口返回值为`E_NOT_OK`。
+
+???+ note
+    Note that for a gateway of an I-PDU the PduR_<Lo>TxConfirmation is not interesting (except for FIFO of a direct data provision PDU).
+
+> **[SWS_PduR_00640]**：If the destination communication interface module confirms the (successful or failed) transmission of the I-PDU using PduR_<DstLo>TxConfirmation and destination is not a direct data provision Pdu with FIFO buffer the PDU Router module shall not do anything.
+
+被网关的I-PDU可能具有不同的长度。所以：
+
+> **[SWS_PduR_00783]**：如果I-PDU被PDUR模块不带buffer路由，则PDUR应当按I-PDU的最小长度路由。
+- 接收数据长度
+- 发送目的I-PDU的数据长度
+
+> **[SWS_PduR_00746]**：如果I-PDU被PDUR模块缓存，PDUR模块应当拷贝I-PDU数据的长度为以下值的最小值：
+- 接收数据长度
+- buffer  PduRPduMaxLength配置值。此情况下，接收I-PDU剩余部分的数据将被丢弃。
+
+当调用`PduR_<DstLo>TriggerTransmit`时，**[SWS_PduR_00746]**提供了避免buffer溢出的可能性。用户需要配置PduRPduMaxLength不超过目的I-PDU的长度。
+
+> **[SWS_PduR_00784]**：direct data provision下，当I-PDU被从PDUR buffer传输到目的模块时，PDUR应当将拷贝到buffer的字节数作为SdnLength。
+
+> **[SWS_PduR_00819]**：trigger transmit data provision下，当I-PDU从PduR缓冲区复制到目标模块时，PduR应检查作为SduLength的下层缓冲区大小。如果下层缓冲区对于存储的PDU数据而言太小，则PduR将返回E_NOT_OK，并且不再处理触发发送调用。
+
+???+ note
+    **[SWS_PduR_00819]**中，不处理TriggerTransmit调用，意味着PDU不得从PduR缓冲区中删除。
+
 ###### 7.1.3.1.1 错误处理
 
+如果接口模块拒绝属于网关操作的传输请求，则PDUR模块不得对I-PDU实例执行任何错误处理。
+
+> **[SWS_PduR_00256]**：如果目的通信接口模块在调用`<DstLo>_Transmit`时返回`E_NOT_OK`后，PDUR模块不应该重试传输。
+
+此处目的模块出于某种原因返回`E_NOT_OK`，也会报告此错误。 PDU路由器模块除了丢弃I-PDU之外不能做其他任何事情。
+
 ##### 7.1.3.2 传输协议
+
+将I-PDU从一个源TP模块路由到一个或多个目的TP模块有两种方式，一是完整的I-PDU发送（在发送前，接收所有N-PDU组成I-PDU)，二是，发送I-PDU片段(on-the-fly gatewaying)，在发送前，应当接收一定字节数量的I-PDU片段，该数值由PduRTpThreshold定义。
+
+通常，PDUR仅对有效载荷进行网关处理，并且不会知道传输协议的详细信息，例如SF，FF，CF，PCI等。但是PduR还应支持带MetaData的I-PDU路由，并使用MetaDataType进行配置。这种I-PDU在通信接口路由或转发过程中不需要特殊处理，但是对于TP路由，附加信息必须单独发送。以下要求与直接网关和on-the-fly gatewaying相关：
+
+> **[SWS_PduR_00794]**：`PduR_<SrcLoTp>StartOfReception`接口提供I-PDU的MetaData应当被存储并提供给`<DstLoTp>_Transmit`。
+
+TP模块中，I-PDU可以被分为多个N-PDU传输(如FF和CF)，或者单帧N-PDU(SF)。一种使用场景是，由多个N-PDU组成的I-PDU不能通过多播传输(比如可以用于物理寻址)，另一种是单个N-PDU可以用于多播传输(比如功能寻址)。另一个用例是将多帧消息多播到本地接收器和多个网关目的地。
+
+???+ note
+    举例，Can上接收到的单帧SF需要发送到两路LIN上，接收到SF可以携带6byte数据，但是LIN上只能携带5byte，因此，必须路由到两路LIN上时，CAN上的SF数据需要被限定为5bytes。
+
+注意，通过传输协议模块传输的I-PDU也可以直接通过通信接口逐帧地被路由（即通过网关直接对N-PDU进行路由）。此处无需对PDUR模块进行特殊处理，可以通过通信接口模块进行网关处理，请参见7.1.3.1。但是，这要求源总线和目标总线具有完全相同的N-PDU打包（例如，从CAN到CAN）。
 
 ###### 7.1.3.2.1 缓冲区分配
 
