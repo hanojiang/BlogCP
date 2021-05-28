@@ -26,6 +26,10 @@ nav:
   - 以太网:
     - 组播: ETH/Multicast.md
     - ENET-ISR: ETH/EthISR.md 
+  - 基础模块:
+    - 链接文件: BASE/link_file.md
+  - 错误总结:
+    - ECC错误: ERROR/ecc_error.md
   #- MCal:
 
 # Theme
