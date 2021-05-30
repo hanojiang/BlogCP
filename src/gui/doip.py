@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(1017, 937)
         self.action_buildConnection = QAction(MainWindow)
         self.action_buildConnection.setObjectName(u"action_buildConnection")
         self.centralwidget = QWidget(MainWindow)
@@ -75,25 +75,74 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addLayout(self.verticalLayout)
 
+        self.horizontalLayout.setStretch(0, 2)
+        self.horizontalLayout.setStretch(1, 2)
+        self.horizontalLayout.setStretch(2, 5)
+        self.horizontalLayout.setStretch(3, 18)
+        self.horizontalLayout.setStretch(4, 2)
+        self.horizontalLayout.setStretch(5, 2)
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.label_2 = QLabel(self.tab)
+        self.label_2.setObjectName(u"label_2")
+
+        self.horizontalLayout_3.addWidget(self.label_2)
+
+        self.payloadSecletBox = QComboBox(self.tab)
+        self.payloadSecletBox.setObjectName(u"payloadSecletBox")
+
+        self.horizontalLayout_3.addWidget(self.payloadSecletBox)
+
+        self.payloadContent = QLineEdit(self.tab)
+        self.payloadContent.setObjectName(u"payloadContent")
+
+        self.horizontalLayout_3.addWidget(self.payloadContent)
+
+        self.doipMsgSendButton = QPushButton(self.tab)
+        self.doipMsgSendButton.setObjectName(u"doipMsgSendButton")
+
+        self.horizontalLayout_3.addWidget(self.doipMsgSendButton)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+
+        self.horizontalLayout_3.setStretch(0, 2)
+        self.horizontalLayout_3.setStretch(1, 8)
+        self.horizontalLayout_3.setStretch(2, 18)
+        self.horizontalLayout_3.setStretch(3, 2)
+        self.horizontalLayout_3.setStretch(4, 2)
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.otherMsgBrowser = QTextBrowser(self.tab)
-        self.otherMsgBrowser.setObjectName(u"otherMsgBrowser")
+        self.InfoMsgBrowser = QTextBrowser(self.tab)
+        self.InfoMsgBrowser.setObjectName(u"InfoMsgBrowser")
 
-        self.horizontalLayout_2.addWidget(self.otherMsgBrowser)
+        self.horizontalLayout_2.addWidget(self.InfoMsgBrowser)
 
-        self.MsgTxRxBrowser = QTextBrowser(self.tab)
-        self.MsgTxRxBrowser.setObjectName(u"MsgTxRxBrowser")
-        self.MsgTxRxBrowser.setContextMenuPolicy(Qt.ActionsContextMenu)
+        self.DiagMsgTxRxBrowser = QTextBrowser(self.tab)
+        self.DiagMsgTxRxBrowser.setObjectName(u"DiagMsgTxRxBrowser")
+        self.DiagMsgTxRxBrowser.setContextMenuPolicy(Qt.ActionsContextMenu)
 
-        self.horizontalLayout_2.addWidget(self.MsgTxRxBrowser)
+        self.horizontalLayout_2.addWidget(self.DiagMsgTxRxBrowser)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
+        self.DoipMsgBrowser = QTextBrowser(self.tab)
+        self.DoipMsgBrowser.setObjectName(u"DoipMsgBrowser")
+
+        self.verticalLayout_2.addWidget(self.DoipMsgBrowser)
+
+        self.verticalLayout_2.setStretch(0, 1)
+        self.verticalLayout_2.setStretch(1, 1)
+        self.verticalLayout_2.setStretch(2, 4)
+        self.verticalLayout_2.setStretch(3, 4)
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
@@ -104,7 +153,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1017, 26))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         MainWindow.setMenuBar(self.menubar)
@@ -135,6 +184,8 @@ class Ui_MainWindow(object):
         self.sendMsgButton.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.localDevRadioButton.setText(QCoreApplication.translate("MainWindow", u"local", None))
         self.remoteDevRadioButton.setText(QCoreApplication.translate("MainWindow", u"remote", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Payload", None))
+        self.doipMsgSendButton.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u8bca\u65ad", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Tab 2", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
