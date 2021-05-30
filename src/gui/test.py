@@ -35,8 +35,13 @@ class MainWindow(QMainWindow):
         self.init_ecuSeclectBox()
         self.init_payloadSecletBox()
 
+        self.setPushButtons(False)
+
         self.init_action()
 
+    def setPushButtons(self, status):
+        self.ui.sendMsgButton.setEnabled(status)
+        self.ui.sendDoipMsgButton.setEnabled(status)
 
     def init_sidSeclectBox(self):
         self.ui.sidSeclectBox.addItems(['10', '11', '22', '2E', '27', '31'])
@@ -64,7 +69,7 @@ class MainWindow(QMainWindow):
     def init_action(self):
         self.ui.action_buildConnection.triggered.connect(self.buildConnection)
         self.ui.sendMsgButton.clicked.connect(self.handleDiagMsgSend)
-        self.ui.doipMsgSendButton.clicked.connect(self.handleDoipMsgSend)
+        self.ui.sendDoipMsgButton.clicked.connect(self.handleDoipMsgSend)
 
 
     def buildConnection(self):
@@ -75,14 +80,12 @@ class MainWindow(QMainWindow):
 
             self.textBrowserAppendMsg(self.ui.InfoMsgBrowser, '正在建立ECU连接')
 
-            self.ui.action_buildConnection.setEnabled(False)
-            msg = DoIPMessage(DOIP_VehIdReqMsg)
-            self.ethTp.send(msg)
-            #self.textBrowserAppendMsg(self.ui.DoipMsgBrowser, str(msg))
 
-            msg = DoIPMessage(DOIP_RoutingActiveReq)
-            self.ethTp.send(msg)
-            #self.textBrowserAppendMsg(self.ui.DoipMsgBrowser, str(msg))
+
+            self.ui.action_buildConnection.setEnabled(False)
+
+
+
 
             thread_deal_connection = Thread(target=self.msgRecvThreadFunc)
             thread_deal_connection.start()
@@ -91,6 +94,8 @@ class MainWindow(QMainWindow):
 
             self.ecuConnectionStatus = False
             self.changeButtonText(self.ui.action_buildConnection, '建立连接')
+
+            # self.ethTp.closeConnection()
 
     def changeButtonText(self, button, str):
         """
@@ -104,14 +109,33 @@ class MainWindow(QMainWindow):
         """
             thread function for build connection
         """
+
+
+        try:
+            # self.ethTp.openConnection()
+            pass
+        except ConnectionRefusedError:
+            global_ms.text_print.emit(self.ui.InfoMsgBrowser, 'ECU连接建立失败')
+            self.ui.action_buildConnection.setEnabled(True)
+            return
+
+
+        msg = DoIPMessage(DOIP_VehIdReqMsg)
+        self.ethTp.send(msg)
+
+        msg = DoIPMessage(DOIP_RoutingActiveReq)
+        self.ethTp.send(msg)
+
         vehAncResp = EthTp.recv(3, DOIP_VehIdReqMsg)
         routeActResp = EthTp.recv(3, DOIP_RoutingActiveReq)
         if(vehAncResp is None or routeActResp is None):
             global_ms.text_print.emit(self.ui.InfoMsgBrowser, 'ECU连接建立失败')
+            self.setPushButtons(False)
 
 
         else:
             self.ecuConnectionStatus = True
+            self.setPushButtons(True)
             global_ms.text_print.emit(self.ui.InfoMsgBrowser, 'ECU连接建立成功')
             #global_ms.text_print.emit(self.ui.DoipMsgBrowser, str(vehAncResp))
             #global_ms.text_print.emit(self.ui.DoipMsgBrowser, str(routeActResp))

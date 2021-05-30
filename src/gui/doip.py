@@ -101,10 +101,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.payloadContent)
 
-        self.doipMsgSendButton = QPushButton(self.tab)
-        self.doipMsgSendButton.setObjectName(u"doipMsgSendButton")
+        self.sendDoipMsgButton = QPushButton(self.tab)
+        self.sendDoipMsgButton.setObjectName(u"sendDoipMsgButton")
 
-        self.horizontalLayout_3.addWidget(self.doipMsgSendButton)
+        self.horizontalLayout_3.addWidget(self.sendDoipMsgButton)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -185,7 +185,7 @@ class Ui_MainWindow(object):
         self.localDevRadioButton.setText(QCoreApplication.translate("MainWindow", u"local", None))
         self.remoteDevRadioButton.setText(QCoreApplication.translate("MainWindow", u"remote", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Payload", None))
-        self.doipMsgSendButton.setText(QCoreApplication.translate("MainWindow", u"Send", None))
+        self.sendDoipMsgButton.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u8bca\u65ad", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Tab 2", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
