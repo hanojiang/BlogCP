@@ -1,2 +1,5 @@
 site/
 *.pyc
+*.spec
+src/gui/build/*
+src/gui/dist/*
