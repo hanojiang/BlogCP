@@ -36,7 +36,7 @@
     
     
       
-        <title>ENET-ISR - My Wiki</title>
+        <title>链接文件 - My Wiki</title>
       
     
     
@@ -81,7 +81,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#enet" tabindex="1" class="md-skip">
+      <a href="#vlinkgen" tabindex="1" class="md-skip">
         跳转至
       </a>
     
@@ -107,7 +107,7 @@
                 My Wiki
               </span>
               <span class="md-header-nav__topic">
-                ENET-ISR
+                链接文件
               </span>
             
           
@@ -192,7 +192,7 @@
   
     <li class="md-tabs__item">
       
-        <a href="../Multicast/" title="以太网" class="md-tabs__link md-tabs__link--active">
+        <a href="../../ETH/Multicast/" title="以太网" class="md-tabs__link">
           以太网
         </a>
       
@@ -205,7 +205,7 @@
   
     <li class="md-tabs__item">
       
-        <a href="../../BASE/link_file/" title="基础模块" class="md-tabs__link">
+        <a href="./" title="基础模块" class="md-tabs__link md-tabs__link--active">
           基础模块
         </a>
       
@@ -325,12 +325,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
     
     <label class="md-nav__link" for="nav-3">
       以太网
@@ -348,11 +346,49 @@
 
 
   <li class="md-nav__item">
-    <a href="../Multicast/" title="组播" class="md-nav__link">
+    <a href="../../ETH/Multicast/" title="组播" class="md-nav__link">
       组播
     </a>
   </li>
 
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../ETH/EthISR/" title="ENET-ISR" class="md-nav__link">
+      ENET-ISR
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      基础模块
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        基础模块
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
         
           
           
@@ -367,11 +403,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        ENET-ISR
+        链接文件
       </label>
     
-    <a href="./" title="ENET-ISR" class="md-nav__link md-nav__link--active">
-      ENET-ISR
+    <a href="./" title="链接文件" class="md-nav__link md-nav__link--active">
+      链接文件
     </a>
     
       
@@ -383,8 +419,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#enet" title="ENET中断分析" class="md-nav__link">
-    ENET中断分析
+  <a href="#vlinkgen" title="vlinkGen模块梳理" class="md-nav__link">
+    vlinkGen模块梳理
   </a>
   
 </li>
@@ -403,42 +439,6 @@
   
 </nav>
     
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
-    
-    <label class="md-nav__link" for="nav-4">
-      基础模块
-    </label>
-    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-4">
-        基础模块
-      </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../BASE/link_file/" title="链接文件" class="md-nav__link">
-      链接文件
-    </a>
   </li>
 
         
@@ -502,8 +502,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#enet" title="ENET中断分析" class="md-nav__link">
-    ENET中断分析
+  <a href="#vlinkgen" title="vlinkGen模块梳理" class="md-nav__link">
+    vlinkGen模块梳理
   </a>
   
 </li>
@@ -531,19 +531,9 @@
               
                 
                 
-                  <h1>ENET-ISR</h1>
+                  <h1>链接文件</h1>
                 
-                <h2 id="enet">ENET中断分析<a class="headerlink" href="#enet" title="Permanent link">&para;</a></h2>
-<p>ENET 由中断触发到上层数据接收并处理的过程见下图。</p>
-<p><img alt="" src="../images/eth_isr.svg" /></p>
-<p>其中<code>Eth_30_Enet_Irq.c</code>中包含<code>OS</code>中配置的<code>ENET</code>中断处理函数：</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
-2</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">ISR</span><span class="p">(</span> <span class="n">EthIsr_EthernetCnt_MCU_Ctrl_ad7672f0_EthInterruptServiceRoutine_Q0Rx</span> <span class="p">);</span>
-<span class="n">ISR</span><span class="p">(</span> <span class="n">EthIsr_EthernetCnt_MCU_Ctrl_ad7672f0_EthInterruptServiceRoutine_Q0Tx</span> <span class="p">);</span>
-</pre></div>
-</td></tr></table>
-
-<p>后续通过<code>Eth_30_Enet_Internal_Receive</code>处理接收到的数据帧，其中由<code>Eth_30_Enet_Receive_ProcessValidFrame</code>验证数据帧后，由<code>EthIf_RxIndication</code>传至上层模块。</p>
+                <h2 id="vlinkgen">vlinkGen模块梳理<a class="headerlink" href="#vlinkgen" title="Permanent link">&para;</a></h2>
                 
                   
                 
@@ -580,7 +570,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../Multicast/" title="组播" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../../ETH/EthISR/" title="ENET-ISR" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -589,19 +579,19 @@
                 <span class="md-footer-nav__direction">
                   后退
                 </span>
-                组播
+                ENET-ISR
               </span>
             </div>
           </a>
         
         
-          <a href="../../BASE/link_file/" title="链接文件" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../../ERROR/ecc_error/" title="ECC错误" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   前进
                 </span>
-                链接文件
+                ECC错误
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
