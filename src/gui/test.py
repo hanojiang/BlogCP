@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
         self.ecuConnectionStatus = False
         self.init_commponents()
 
-        self.ethTp = EthTp(self.ui.DoipMsgBrowser)
+        # self.ethTp = EthTp(self.ui.DoipMsgBrowser)
 
         global_ms.text_print.connect(self.textBrowserAppendMsg)
         global_ms.changeConnectionButtor.connect(self.changeButtonText)
@@ -95,7 +95,8 @@ class MainWindow(QMainWindow):
             self.ecuConnectionStatus = False
             self.changeButtonText(self.ui.action_buildConnection, '建立连接')
 
-            # self.ethTp.closeConnection()
+            self.ethTp.closeConnection()
+            del self.ethTp
 
     def changeButtonText(self, button, str):
         """
@@ -112,7 +113,8 @@ class MainWindow(QMainWindow):
 
 
         try:
-            # self.ethTp.openConnection()
+            self.ethTp = EthTp(self.ui.DoipMsgBrowser)
+            self.ethTp.openConnection()
             pass
         except ConnectionRefusedError:
             global_ms.text_print.emit(self.ui.InfoMsgBrowser, 'ECU连接建立失败')
@@ -162,6 +164,9 @@ class MainWindow(QMainWindow):
         # print(msg)
 
         self.ethTp.send(msg)
+
+        diagResp = self.ethTp.recv(3, DOIP_DiagMsg)
+        self.textBrowserAppendMsg(self.ui.DiagMsgTxRxBrowser, 'Rx: ' + self.formatMsg(str(diagResp.getData())))
 
     def handleDoipMsgSend(self):
         # print(self.ui.payloadSecletBox.currentIndex(), self.ui.payloadSecletBox.currentText())
@@ -215,9 +220,5 @@ if __name__ == "__main__":
 
     window = MainWindow()
     window.show()
-
-    #uds = Uds()
-
-
 
     sys.exit(app.exec_())
