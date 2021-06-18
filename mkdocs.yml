@@ -23,6 +23,8 @@ nav:
   - 网络:
     - PDUR: COM/pdur.md
   #- 诊断:
+  - 存储:
+    - NVM: NVM/nvm.md
   - 以太网:
     - 组播: ETH/Multicast.md
     - ENET-ISR: ETH/EthISR.md 
