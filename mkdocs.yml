@@ -32,6 +32,8 @@ nav:
     - 链接文件: BASE/link_file.md
   - 错误总结:
     - ECC错误: ERROR/ecc_error.md
+  - Linux开发-MP157:
+    - 环境搭建: MP157/environment_start.md
   #- MCal:
 
 # Theme

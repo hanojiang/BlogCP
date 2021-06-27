@@ -1,0 +1,38 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Appl/GenData/Components",
+                "${workspaceFolder}/Appl/GenData/include",
+                "${workspaceFolder}/Appl/GenData",
+                "${workspaceFolder}/Appl/Source/Bsw/EepromCheck",
+                "${workspaceFolder}/Appl/Source/Bsw/Icmp",
+                "${workspaceFolder}/Appl/Source/Bsw/Include",
+                "${workspaceFolder}/Appl/Source/Bsw/nvm",
+                "${workspaceFolder}/Appl/Source/Bsw/Startup/Include",
+                "${workspaceFolder}/Appl/Source/Bsw/stmCounter",
+                "${workspaceFolder}/Appl/Source/CDD_NM/include",
+                "${workspaceFolder}/Appl/Source/CtApNmappAppSwc",
+                "${workspaceFolder}/Appl/Source/DGW",
+                "${workspaceFolder}/Appl/Source/GW_SWC",
+                "${workspaceFolder}/Appl/Source/Swc_inc",
+                "${workspaceFolder}/Appl/Source"
+
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.14393.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Tools/MSVC/14.10.25017/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
+        }
+    ],
+    "version": 4
+}
+
