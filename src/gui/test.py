@@ -7,6 +7,9 @@ from DoipJsonFormat import GW04_ALL_NODE
 from uds import *
 from threading import Thread
 from GlobalSignals import GlobalSigals
+import time
+from ctypes import *
+import os
 
 global_ms = GlobalSigals()
 
@@ -89,6 +92,8 @@ class MainWindow(QMainWindow):
 
             thread_deal_connection = Thread(target=self.msgRecvThreadFunc)
             thread_deal_connection.start()
+
+
         else:
             self.textBrowserAppendMsg(self.ui.InfoMsgBrowser, '断开ECU连接')
 
@@ -98,6 +103,9 @@ class MainWindow(QMainWindow):
             self.ethTp.closeConnection()
             del self.ethTp
 
+
+
+
     def changeButtonText(self, button, str):
         """
 
@@ -105,6 +113,17 @@ class MainWindow(QMainWindow):
         :param str: change the text of button for this value
         """
         button.setText(str)
+
+    def msg_3E80_SendThreadFunc(self):
+        while True:
+            msg = DoIPMessage(DOIP_DiagMsg)
+            # msg.setDirection('tx')
+
+            msg.setDiagData([0x3e, 0x80])
+            self.ethTp.send(msg)
+            time.sleep(1)
+            if self.ecuConnectionStatus is False:
+                break
 
     def msgRecvThreadFunc(self):
         """
@@ -142,6 +161,10 @@ class MainWindow(QMainWindow):
             #global_ms.text_print.emit(self.ui.DoipMsgBrowser, str(vehAncResp))
             #global_ms.text_print.emit(self.ui.DoipMsgBrowser, str(routeActResp))
             global_ms.changeConnectionButtor.emit(self.ui.action_buildConnection, '断开连接')
+
+            thread_3e_80 = Thread(target=self.msg_3E80_SendThreadFunc)
+            thread_3e_80.start()
+
         self.ui.action_buildConnection.setEnabled(True)
 
     def handleDiagMsgSend(self):
@@ -166,8 +189,25 @@ class MainWindow(QMainWindow):
         self.ethTp.send(msg)
 
         if(sidMsg == '27' and diag_msg == '01'):
-            print(msg)
-            print(self.ethTp.recv(1, DOIP_DiagMsg))
+            #print(msg.getDiagData())
+
+            diag_recvMsg = self.ethTp.recv(1, DOIP_DiagMsg)
+            #print(diag_recvMsg.getDiagData())
+            while(diag_recvMsg.getDiagData()[0] != 0x67 and diag_recvMsg.getDiagData()[0] != 0x7f):
+                diag_recvMsg = self.ethTp.recv(1, DOIP_DiagMsg)
+            print('recv seed: ', diag_recvMsg.getDiagData())
+            if len(diag_recvMsg.getDiagData()) == 6:
+                key = keyGen(diag_recvMsg.getDiagData()[2:])
+                #print(type(key))
+                key_msg = DoIPMessage(DOIP_DiagMsg)
+                key_data = [0x27, 0x02]
+                key_data.extend(key)
+                key_msg.setDiagData(key_data)
+                self.ethTp.send(key_msg)
+
+                print('send key ', key_msg.getDiagData())
+            else:
+                pass
 
         # diagResp = self.ethTp.recv(3, DOIP_DiagMsg)
         # diagRespData = diagResp.getDiagData()
@@ -223,6 +263,27 @@ class MainWindow(QMainWindow):
     def formatMsg(self, msg):
         msg = self.getListStr(msg)
         return ' '.join(msg)
+
+
+def keyGen(seed_input):
+    #print(os.getcwd())
+    lib = cdll.LoadLibrary(os.getcwd() + '\libkeygen.so')
+    seed_data = c_char * 4
+    seed = seed_data()
+
+    for i in range(4):
+        seed[i] = seed_input[i]
+
+    key_data = c_char * 4
+    key = key_data()
+
+    lib.GenerateKeyEx(seed, 4, key)
+
+    key_output = []
+    for i in range(4):
+        key_output.append(key[i][0])
+
+    return key_output
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
