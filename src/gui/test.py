@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
         self.ui.sendDoipMsgButton.setEnabled(status)
 
     def init_sidSeclectBox(self):
-        self.ui.sidSeclectBox.addItems(['10', '11', '22', '2E', '27', '31'])
+        self.ui.sidSeclectBox.addItems(['10', '11', '22', '2E', '27', '31', '19'])
 
     def init_ecuSeclectBox(self):
         self.ui.ecuSeclectBox.addItems(self.getAllEcuNode())
@@ -193,7 +193,7 @@ class MainWindow(QMainWindow):
 
             diag_recvMsg = self.ethTp.recv(1, DOIP_DiagMsg)
             #print(diag_recvMsg.getDiagData())
-            while(diag_recvMsg.getDiagData()[0] != 0x67 and diag_recvMsg.getDiagData()[0] != 0x7f):
+            while(diag_recvMsg.getDiagData()[0] != 0x67 or len(diag_recvMsg.getDiagData())!= 6):#and diag_recvMsg.getDiagData()[0] != 0x7f
                 diag_recvMsg = self.ethTp.recv(1, DOIP_DiagMsg)
             print('recv seed: ', diag_recvMsg.getDiagData())
             if len(diag_recvMsg.getDiagData()) == 6:

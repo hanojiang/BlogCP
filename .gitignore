@@ -3,3 +3,4 @@ site/
 *.spec
 src/gui/build/*
 src/gui/dist/*
+.idea
