@@ -13,8 +13,20 @@ class Main_Ui(Ui_MainWindow):
         self.__globalSignal = GlobalSigals()
         self.__init_all_components()
         self.__init_all_actions()
+        # self.__init_uds_settings()
 
         self.__doip_connection_status = False
+
+
+    def __init_uds_settings(self):
+        self.__ecu_ip_address = self.ecuIpAddressLineEdit.text()
+        self.__ecu_logical_address = int(self.ecuLogicalAddressLineEdit.text(), 16)
+        self.__tester_ip_address = self.testerIpAddresslineEdit.text()
+        self.__tester_logical_address = int(self.testerLogicalAddressLineEdit.text(),16)
+
+        print(self.__ecu_ip_address, self.__ecu_logical_address)
+        print(self.__tester_ip_address, self.__tester_logical_address)
+
 
     def __init_all_components(self):
         self.__init_sidSeclectBox()
@@ -46,7 +58,11 @@ class Main_Ui(Ui_MainWindow):
         try:
             if not self.__doip_connection_status:
 
-                self.ecu = Uds(transportProtocol="DoIP", ecu_ip="127.0.0.1")
+                # self.ecu = Uds(transportProtocol="DoIP", ecu_ip="127.0.0.1")
+                self.__init_uds_settings()
+                self.ecu = Uds(transportProtocol="DoIP", ecu_ip=self.__ecu_ip_address, ecu_logical_address=self.__ecu_logical_address, client_logical_address=self.__tester_logical_address)
+                client_ip_addr, client_port = self.ecu.tp.get_lcoal_doip_connection_info()
+                self.testerIpAddresslineEdit.setText(client_ip_addr)
                 # self.__udsThread = Thread(target=self.__build_uds_connection)
                 # self.__udsThread.start()
 

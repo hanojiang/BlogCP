@@ -146,6 +146,91 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.diagTab, "")
         self.settingTab = QWidget()
         self.settingTab.setObjectName(u"settingTab")
+        self.verticalLayout_6 = QVBoxLayout(self.settingTab)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.ipSettingGroupBox = QGroupBox(self.settingTab)
+        self.ipSettingGroupBox.setObjectName(u"ipSettingGroupBox")
+        self.verticalLayout_5 = QVBoxLayout(self.ipSettingGroupBox)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.label_5 = QLabel(self.ipSettingGroupBox)
+        self.label_5.setObjectName(u"label_5")
+
+        self.horizontalLayout_6.addWidget(self.label_5)
+
+        self.testerIpAddresslineEdit = QLineEdit(self.ipSettingGroupBox)
+        self.testerIpAddresslineEdit.setObjectName(u"testerIpAddresslineEdit")
+
+        self.horizontalLayout_6.addWidget(self.testerIpAddresslineEdit)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_6)
+
+        self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.label_6 = QLabel(self.ipSettingGroupBox)
+        self.label_6.setObjectName(u"label_6")
+
+        self.horizontalLayout_7.addWidget(self.label_6)
+
+        self.ecuIpAddressLineEdit = QLineEdit(self.ipSettingGroupBox)
+        self.ecuIpAddressLineEdit.setObjectName(u"ecuIpAddressLineEdit")
+
+        self.horizontalLayout_7.addWidget(self.ecuIpAddressLineEdit)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_7)
+
+
+        self.horizontalLayout_8.addWidget(self.ipSettingGroupBox)
+
+        self.logicalAddressSettingGroupBox = QGroupBox(self.settingTab)
+        self.logicalAddressSettingGroupBox.setObjectName(u"logicalAddressSettingGroupBox")
+        self.verticalLayout_4 = QVBoxLayout(self.logicalAddressSettingGroupBox)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.label_3 = QLabel(self.logicalAddressSettingGroupBox)
+        self.label_3.setObjectName(u"label_3")
+
+        self.horizontalLayout_4.addWidget(self.label_3)
+
+        self.testerLogicalAddressLineEdit = QLineEdit(self.logicalAddressSettingGroupBox)
+        self.testerLogicalAddressLineEdit.setObjectName(u"testerLogicalAddressLineEdit")
+
+        self.horizontalLayout_4.addWidget(self.testerLogicalAddressLineEdit)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_4)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.label_4 = QLabel(self.logicalAddressSettingGroupBox)
+        self.label_4.setObjectName(u"label_4")
+
+        self.horizontalLayout_5.addWidget(self.label_4)
+
+        self.ecuLogicalAddressLineEdit = QLineEdit(self.logicalAddressSettingGroupBox)
+        self.ecuLogicalAddressLineEdit.setObjectName(u"ecuLogicalAddressLineEdit")
+
+        self.horizontalLayout_5.addWidget(self.ecuLogicalAddressLineEdit)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_5)
+
+
+        self.horizontalLayout_8.addWidget(self.logicalAddressSettingGroupBox)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_8)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_6.addItem(self.verticalSpacer)
+
         self.tabWidget.addTab(self.settingTab, "")
 
         self.verticalLayout_3.addWidget(self.tabWidget)
@@ -169,7 +254,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -187,6 +272,16 @@ class Ui_MainWindow(object):
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Type", None))
         self.sendDoipUdpMsgButton.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.diagTab), QCoreApplication.translate("MainWindow", u"\u8bca\u65ad", None))
+        self.ipSettingGroupBox.setTitle(QCoreApplication.translate("MainWindow", u"Ip Address", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Tester", None))
+        self.testerIpAddresslineEdit.setText(QCoreApplication.translate("MainWindow", u"172.31.7.2", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"Ecu   ", None))
+        self.ecuIpAddressLineEdit.setText(QCoreApplication.translate("MainWindow", u"172.31.7.1", None))
+        self.logicalAddressSettingGroupBox.setTitle(QCoreApplication.translate("MainWindow", u"Node Logical Address", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Tester", None))
+        self.testerLogicalAddressLineEdit.setText(QCoreApplication.translate("MainWindow", u"0e80", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Ecu   ", None))
+        self.ecuLogicalAddressLineEdit.setText(QCoreApplication.translate("MainWindow", u"1000", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingTab), QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
