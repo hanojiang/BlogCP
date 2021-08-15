@@ -2,7 +2,8 @@ from gui import Ui_MainWindow
 from Ecu_Const import get_all_ecu, DIAG_SID
 from uds import Uds
 from PySide2.QtCore import Signal,QObject
-from PySide2.QtWidgets import QApplication, QMainWindow, QAction, QTextBrowser
+from PySide2.QtWidgets import QApplication, QMainWindow, QAction, QTextBrowser, QTableWidget, QTableWidgetItem
+from PySide2.QtWidgets import QHeaderView
 from threading import Thread
 
 class Main_Ui(Ui_MainWindow):
@@ -33,6 +34,7 @@ class Main_Ui(Ui_MainWindow):
         self.__init_ecuSeclectBox()
         self.__set_pushbutton_status(False)
         self.__init_all_signals()
+        self.__init_multi_diag_msg_tableWidget()
 
     def __init_sidSeclectBox(self):
         self.sidSeclectBox.addItems(DIAG_SID)
@@ -49,10 +51,32 @@ class Main_Ui(Ui_MainWindow):
     def __init_all_actions(self):
         self.buildConnectionButton.triggered.connect(self.__init_uds_client_action)
         self.sendDiagMsgButton.clicked.connect(self.__send_diagMsg_action)
+        self.addLinePushButton.clicked.connect(self.__add_Line_PushButton_action)
+        self.clearPushButton.clicked.connect(self.__clear_tableWidget_PushButton_action)
+        self.multiSendPushButton.clicked.connect(self.__multi_line_send_PushButton_action)
+
         # self.sendDoipUdpMsgButton.clicked.connect()
 
     def __init_all_signals(self):
         self.__globalSignal.msgPrintBrowserSignal.connect(self.append_msg_to_textBrowser)
+
+    def __init_multi_diag_msg_tableWidget(self):
+        # self.multiLineTableWidget.insertRow(0)
+        # qv = QHeaderView(Horizontal)
+        # hh = self.multiLineTableWidget.horizontalHeader()
+        # vh = self.multiLineTableWidget.verticalHeaderItem(0)
+        # vh.setText('11111')
+        # print(self.multiLineTableWidget.rowCount())
+        #
+        # self.multiLineTableWidget.setVerticalHeaderItem(1)
+        # vh = self.multiLineTableWidget.takeVerticalHeaderItem(2)
+        # # vh.setText('2222')
+        # print(self.multiLineTableWidget.rowCount())
+
+        # for i in range(5):
+        #     self.multiLineTableWidget.insertRow(i)
+        # print(self.multiLineTableWidget.rowCount())
+        pass
 
     def __init_uds_client_action(self):
         try:
@@ -101,6 +125,28 @@ class Main_Ui(Ui_MainWindow):
             response = self.ecu.send(diagMsg)
             print(response)
             self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Rx: ', Main_Ui.get_byte_split_msg( Main_Ui.hex_DiagMsg2_str(response))))
+
+    def __add_Line_PushButton_action(self):
+        rowCnt = self.multiLineTableWidget.rowCount()
+        sid = self.sidLineEdit.text()
+        diagData = self.diagDataLineEdit.text()
+
+        self.multiLineTableWidget.insertRow(rowCnt)
+        self.multiLineTableWidget.setItem(rowCnt, 0, QTableWidgetItem(sid))
+        self.multiLineTableWidget.setItem(rowCnt, 1, QTableWidgetItem(diagData))
+        # self.multiLineTableWidget.item(rowCnt, 0).setText(sid)
+        # self.multiLineTableWidget.item(rowCnt, 1).setText(diagData)
+
+    def __clear_tableWidget_PushButton_action(self):
+        self.multiLineTableWidget.setRowCount(0)
+
+    def __multi_line_send_PushButton_action(self):
+        for i in range(self.multiLineTableWidget.rowCount()):
+            sid = self.multiLineTableWidget.item(i, 0).text()
+            diagData = self.multiLineTableWidget.item(i, 1).text()
+            diagMsg = sid + diagData
+            self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Tx: ', Main_Ui.get_byte_split_msg(diagMsg)))
+
 
 
     def append_msg_to_diagMsgPrintBrowser(self, msg):
