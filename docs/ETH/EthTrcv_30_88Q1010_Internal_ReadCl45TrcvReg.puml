@@ -1,0 +1,43 @@
+@startuml EthTrcv_30_88Q1010_Internal_ReadCl45TrcvReg
+
+group EthTrcv_30_88Q1010_Internal_ReadCl45TrcvReg
+    EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_ReadCl45TrcvReg
+    group EthTrcv_30_88Q1010_SetCl45AddrReg
+        EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_SetCl45AddrReg
+        group EthTrcv_30_88Q1010_Internal_WriteTrcvReg
+            EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_WriteTrcvReg(3次)
+
+            EthTrcv_30_88Q1010_Hw.c -> EthSwt_30_88Q5050.c: EthSwt_30_88Q5050_WriteTrcvRegister
+            EthSwt_30_88Q5050.c -> EthSwt_30_88Q5050_LL.h: EthSwt_30_88Q5050_LL_WriteIntTrcvRegister
+            group EthSwt_30_88Q5050_LL_PhyAccess_WriteRegSmi
+                EthSwt_30_88Q5050_LL.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_PhyAccess_WriteRegSmi
+                group EthSwt_30_88Q5050_LL_PhyAccess_SynchronizeSmiAccess
+                    EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_PhyAccess_SynchronizeSmiAccess
+                    EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_SynchronizeHwAccess
+                    group EthSwt_30_88Q5050_LL_Reg_SyncReadU16
+                        EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_Reg_SyncReadU16
+
+                        EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_ReadMultiChipAddressingMode
+
+                        EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_SmiCmdAccess_SynchronizeSmiAccess
+
+                        EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_CfgAccess_Int.h: EthSwt_30_88Q5050_Cfg_ReadMii
+                        EthSwt_30_88Q5050_CfgAccess_Int.h -> Eth_30_Enet.c:Eth_30_Enet_Internal_WriteMii
+                    end
+                end
+
+                EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_Reg_SyncReadU16
+                EthSwt_30_88Q5050_LL_HwAccess.h -> EthSwt_30_88Q5050_LL_HwAccess.h: EthSwt_30_88Q5050_LL_Reg_SyncWriteU16
+
+            end
+        end
+
+    end
+
+    group EthTrcv_30_88Q1010_Internal_ReadTrcvReg
+        EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_ReadTrcvReg(1次)
+        EthTrcv_30_88Q1010_Hw.c -> Eth_30_Enet.c:Eth_30_Enet_Internal_ReadMii
+    end
+end
+
+@enduml

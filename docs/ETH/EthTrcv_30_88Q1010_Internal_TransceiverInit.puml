@@ -1,0 +1,60 @@
+' EthTrcv_30_88Q1010_Internal_TransceiverInit 函数调用关系图
+
+@startuml EthTrcv_30_88Q1010_Internal_TransceiverInit
+group EthTrcv_30_88Q1010_LL_IsTransceiverAccessOk
+    EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010.c: EthTrcv_30_88Q1010_LL_IsTransceiverAccessOk
+    group EthTrcv_30_88Q1010_Internal_ReadCl45TrcvReg
+        EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_ReadCl45TrcvReg
+        group EthTrcv_30_88Q1010_SetCl45AddrReg
+            EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_SetCl45AddrReg
+            EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_WriteTrcvReg(3次)
+            EthTrcv_30_88Q1010_Hw.c -> Eth_30_Enet.c:Eth_30_Enet_Internal_WriteMii
+        end
+
+        group EthTrcv_30_88Q1010_Internal_ReadTrcvReg
+            EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_ReadTrcvReg(1次)
+            EthTrcv_30_88Q1010_Hw.c -> Eth_30_Enet.c:Eth_30_Enet_Internal_ReadMii
+        end
+    end
+end
+
+EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010.c: EthTrcv_30_88Q1010_PerformSoftwareReset
+
+group ETHTRCV_30_88Q1010_BEGIN_CRITICAL_SECTION_SEQUENCE
+    EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010_LL.h: EthTrcv_30_88Q1010_LL_SetBasicConfigurationRegister
+    group EthTrcv_30_88Q1010_Internal_WriteCl45TrcvReg
+        EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_WriteCl45TrcvReg
+        group EthTrcv_30_88Q1010_SetCl45AddrReg
+            EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_SetCl45AddrReg
+            EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_WriteTrcvReg(3次)
+            EthTrcv_30_88Q1010_Hw.c -> Eth_30_Enet.c:Eth_30_Enet_Internal_WriteMii
+        end
+
+        group EthTrcv_30_88Q1010_Internal_WriteTrcvReg
+            EthTrcv_30_88Q1010_Hw.c -> EthTrcv_30_88Q1010_Hw.c:EthTrcv_30_88Q1010_Internal_WriteTrcvReg(1次)
+            EthTrcv_30_88Q1010_Hw.c -> Eth_30_Enet.c:Eth_30_Enet_Internal_WriteMii
+        end
+    end
+
+    group EthTrcv_30_88Q1010_LL_ApplyAdditionalConfigSteps
+        EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010_LL.h: EthTrcv_30_88Q1010_LL_ApplyAdditionalConfigSteps
+
+        group EthTrcv_30_88Q1010_ReadClearBitMaskWriteCl45
+        EthTrcv_30_88Q1010_LL.h -> EthTrcv_30_88Q1010_LL.h: EthTrcv_30_88Q1010_ReadClearBitMaskWriteCl45
+            EthTrcv_30_88Q1010_LL.h -> EthTrcv_30_88Q1010_Hw.c: EthTrcv_30_88Q1010_Internal_ReadCl45TrcvReg
+            EthTrcv_30_88Q1010_LL.h -> EthTrcv_30_88Q1010_Hw.c: EthTrcv_30_88Q1010_Internal_WriteCl45TrcvReg
+        end
+
+        group EthTrcv_30_88Q1010_ReadSetBitMaskWriteCl45
+        EthTrcv_30_88Q1010_LL.h -> EthTrcv_30_88Q1010_LL.h: EthTrcv_30_88Q1010_ReadSetBitMaskWriteCl45
+        EthTrcv_30_88Q1010_LL.h -> EthTrcv_30_88Q1010_Hw.c: EthTrcv_30_88Q1010_Internal_ReadCl45TrcvReg
+        EthTrcv_30_88Q1010_LL.h -> EthTrcv_30_88Q1010_Hw.c: EthTrcv_30_88Q1010_Internal_WriteCl45TrcvReg
+        end
+    end
+
+    group EthTrcv_30_88Q1010_LL_SetTransceiverModeDown
+    EthTrcv_30_88Q1010.c -> EthTrcv_30_88Q1010_LL.h: EthTrcv_30_88Q1010_LL_SetTransceiverModeDown
+    EthTrcv_30_88Q1010_LL.h -> EthTrcv_30_88Q1010_LL.h: EthTrcv_30_88Q1010_ReadSetBitMaskWriteCl45(2次)
+    end
+end
+@enduml

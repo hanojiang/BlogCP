@@ -1,0 +1,4 @@
+@startuml EthSwt_30_88Q5050_VSwitchInit
+EthSwt_30_88Q5050.c -> EthSwt_30_88Q5050_LL.h(1522): EthSwt_30_88Q5050_LL_IsDeviceAccessPossible
+
+@enduml
