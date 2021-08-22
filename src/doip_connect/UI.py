@@ -1,10 +1,12 @@
 from gui import Ui_MainWindow
-from Ecu_Const import get_all_ecu, DIAG_SID
+from Ecu_Const import get_all_ecu, DIAG_SID, get_ecu_logical_address_by_index
 from uds import Uds
 from PySide2.QtCore import Signal,QObject
 from PySide2.QtWidgets import QApplication, QMainWindow, QAction, QTextBrowser, QTableWidget, QTableWidgetItem
 from PySide2.QtWidgets import QHeaderView
 from threading import Thread
+from ctypes import *
+import os
 
 class Main_Ui(Ui_MainWindow):
 
@@ -36,6 +38,7 @@ class Main_Ui(Ui_MainWindow):
         self.__init_all_signals()
         self.__init_multi_diag_msg_tableWidget()
 
+
     def __init_sidSeclectBox(self):
         self.sidSeclectBox.addItems(DIAG_SID)
 
@@ -51,11 +54,20 @@ class Main_Ui(Ui_MainWindow):
     def __init_all_actions(self):
         self.buildConnectionButton.triggered.connect(self.__init_uds_client_action)
         self.sendDiagMsgButton.clicked.connect(self.__send_diagMsg_action)
+        self.diagReqMsgLineEdit.returnPressed.connect(self.__send_diagMsg_action)
+
         self.addLinePushButton.clicked.connect(self.__add_Line_PushButton_action)
         self.clearPushButton.clicked.connect(self.__clear_tableWidget_PushButton_action)
         self.multiSendPushButton.clicked.connect(self.__multi_line_send_PushButton_action)
 
         # self.sendDoipUdpMsgButton.clicked.connect()
+        # 具体菜单项
+        msgClearOption = QAction(self.DiagMsgPrintBrowser)
+        msgClearOption.setText("清空")
+        msgClearOption.triggered.connect(self.__clear_all_print_textBrowser)  # 点击菜单中的“发送控制代码”执行的函数
+
+        # tableView 添加具体的右键菜单
+        self.DiagMsgPrintBrowser.addAction(msgClearOption)
 
     def __init_all_signals(self):
         self.__globalSignal.msgPrintBrowserSignal.connect(self.append_msg_to_textBrowser)
@@ -85,7 +97,8 @@ class Main_Ui(Ui_MainWindow):
                 # self.ecu = Uds(transportProtocol="DoIP", ecu_ip="127.0.0.1")
                 self.__init_uds_settings()
                 self.ecu = Uds(transportProtocol="DoIP", ecu_ip=self.__ecu_ip_address, ecu_logical_address=self.__ecu_logical_address, client_logical_address=self.__tester_logical_address)
-                client_ip_addr, client_port = self.ecu.tp.get_lcoal_doip_connection_info()
+                # client_ip_addr, client_port = self.ecu.tp.get_lcoal_doip_connection_info()
+                client_ip_addr, client_port = self.ecu.tp.DoIPClient.get_local_tcp_ip_and_port()
                 self.testerIpAddresslineEdit.setText(client_ip_addr)
                 # self.__udsThread = Thread(target=self.__build_uds_connection)
                 # self.__udsThread.start()
@@ -111,20 +124,16 @@ class Main_Ui(Ui_MainWindow):
     def __send_diagMsg_action(self):
         print('send diag msg')
         sid = self.sidSeclectBox.currentText()
-        ecuName = self.ecuSeclectBox.currentText()
+        # ecuName = self.ecuSeclectBox.currentText()
+        ecuIndex = self.ecuSeclectBox.currentIndex()
+        ecuLogicAddress = get_ecu_logical_address_by_index(ecuIndex)
+        self.ecu.tp.DoIPClient.ecu_logical_address = ecuLogicAddress
 
         diagMsgContent = self.diagReqMsgLineEdit.text()
 
         self.diagReqMsgLineEdit.setText(Main_Ui.get_byte_split_msg(diagMsgContent))
 
-        diagMsg = sid + diagMsgContent
-        self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Tx: ', Main_Ui.get_byte_split_msg(diagMsg)))
-        diagMsg = Main_Ui.str_DiagMsg2_hex(diagMsg)
-
-        if diagMsg:
-            response = self.ecu.send(diagMsg)
-            print(response)
-            self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Rx: ', Main_Ui.get_byte_split_msg( Main_Ui.hex_DiagMsg2_str(response))))
+        self.__send_diagMsg_req_and_get_response(sid, diagMsgContent)
 
     def __add_Line_PushButton_action(self):
         rowCnt = self.multiLineTableWidget.rowCount()
@@ -134,8 +143,7 @@ class Main_Ui(Ui_MainWindow):
         self.multiLineTableWidget.insertRow(rowCnt)
         self.multiLineTableWidget.setItem(rowCnt, 0, QTableWidgetItem(sid))
         self.multiLineTableWidget.setItem(rowCnt, 1, QTableWidgetItem(diagData))
-        # self.multiLineTableWidget.item(rowCnt, 0).setText(sid)
-        # self.multiLineTableWidget.item(rowCnt, 1).setText(diagData)
+
 
     def __clear_tableWidget_PushButton_action(self):
         self.multiLineTableWidget.setRowCount(0)
@@ -144,10 +152,50 @@ class Main_Ui(Ui_MainWindow):
         for i in range(self.multiLineTableWidget.rowCount()):
             sid = self.multiLineTableWidget.item(i, 0).text()
             diagData = self.multiLineTableWidget.item(i, 1).text()
-            diagMsg = sid + diagData
-            self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Tx: ', Main_Ui.get_byte_split_msg(diagMsg)))
+            # diagMsg = sid + diagData
+            # self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Tx: ', Main_Ui.get_byte_split_msg(diagMsg)))
+            self.__send_diagMsg_req_and_get_response(sid, diagData)
 
+    def __clear_all_print_textBrowser(self):
+        self.DiagMsgPrintBrowser.clear()
+        self.InfoPrintBrowser.clear()
 
+    def __send_diagMsg_req_and_get_response(self, sid, diagData):
+        diagMsgReq = sid + diagData
+        # self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Tx: ', Main_Ui.get_byte_split_msg(diagMsgReq)))
+        diagMsgReq = Main_Ui.str_DiagMsg2_hex(diagMsgReq)
+
+        if diagMsgReq:
+            if diagMsgReq[0] == 0x27 and diagMsgReq[1] == 0x01:
+                # response = self.ecu.send(diagMsgReq)
+                # self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Rx: ', Main_Ui.get_byte_split_msg( Main_Ui.hex_DiagMsg2_str(response))))
+                # self.__print_req_response_to_diagMsgPrintBrowser(diagMsgReq, response)
+                response = self.__send_doip_msg(diagMsgReq)
+                if len(response) == 6 and response[0] == 0x67 and response[1] == 0x01:
+                    reqWithKey = [0x27, 0x02]
+                    key = keyGen(response[2:])
+                    reqWithKey.extend(key)
+                    # response = self.ecu.send(reqWithKey)
+                    # self.__print_req_response_to_diagMsgPrintBrowser(reqWithKey, response)
+                    # self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Rx: ', Main_Ui.get_byte_split_msg(Main_Ui.hex_DiagMsg2_str(response))))
+                    self.__send_doip_msg(reqWithKey)
+            else:
+                # response = self.ecu.send(diagMsgReq)
+                # self.__print_req_response_to_diagMsgPrintBrowser(diagMsgReq, response)
+                # print(response)
+                # self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Rx: ', Main_Ui.get_byte_split_msg( Main_Ui.hex_DiagMsg2_str(response))))
+                self.__send_doip_msg(diagMsgReq)
+
+    def __send_doip_msg(self, diagMsgReq):
+        response = self.ecu.send(diagMsgReq)
+        self.__print_req_response_to_diagMsgPrintBrowser(diagMsgReq, response)
+
+        return response
+
+    def __print_req_response_to_diagMsgPrintBrowser(self, diagMsgReq, response):
+        self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Tx: ', Main_Ui.get_byte_split_msg(self.hex_DiagMsg2_str(diagMsgReq))))
+        self.append_msg_to_diagMsgPrintBrowser(
+            Main_Ui.formatMsg('Rx: ', Main_Ui.get_byte_split_msg(Main_Ui.hex_DiagMsg2_str(response))))
 
     def append_msg_to_diagMsgPrintBrowser(self, msg):
         self.__globalSignal.msgPrintBrowserSignal.emit(self.DiagMsgPrintBrowser, msg)
@@ -213,3 +261,24 @@ class GlobalSigals(QObject):
     #update_table = Signal(str)
 
     # changeConnectionButtor = Signal(QPushButton, str)
+
+
+def keyGen(seed_input):
+    #print(os.getcwd())
+    lib = cdll.LoadLibrary(os.getcwd() + '\libkeygen.so')
+    seed_data = c_char * 4
+    seed = seed_data()
+
+    for i in range(4):
+        seed[i] = seed_input[i]
+
+    key_data = c_char * 4
+    key = key_data()
+
+    lib.GenerateKeyEx(seed, 4, key)
+
+    key_output = []
+    for i in range(4):
+        key_output.append(key[i][0])
+
+    return key_output

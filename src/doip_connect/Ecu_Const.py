@@ -178,3 +178,6 @@ def get_all_ecu():
         allNode.append('{:>6}({})'.format(node['MCU_NAME'], hex(node['LOGICAL_ADD'])))
 
     return allNode
+
+def get_ecu_logical_address_by_index(index):
+    return GW04_ALL_NODE[index]['LOGICAL_ADD']

@@ -160,7 +160,7 @@ class DoIPClient:
         self._protocol_version = protocol_version
         self._connect()
         if self._activation_type is not None:
-            result = self.request_activation(self._activation_type, 0x00000000)
+            result = self.request_activation(self._activation_type, vm_specific=0x00000000)
             if result.response_code != RoutingActivationResponse.ResponseCode.Success:
                 raise ConnectionRefusedError(
                     f"Activation Request failed with code {result.response_code}"
@@ -488,12 +488,12 @@ class DoIPClient:
 
         if self._use_secure:
             self._tcp_sock = ssl.wrap_socket(self._tcp_sock)
-        # print(self._tcp_sock.getsockname())
 
     def close(self):
         """Close the DoIP client"""
         self._tcp_sock.close()
         self._udp_sock.close()
+        # print('tcp close')
 
     def reconnect(self, close_delay=A_PROCESSING_TIME):
         """Attempts to re-establish the connection. Useful after an ECU reset
@@ -516,3 +516,11 @@ class DoIPClient:
                 )
     def get_local_tcp_ip_and_port(self):
         return self._tcp_sock.getsockname()
+
+    @property
+    def ecu_logical_address(self):
+        return self._ecu_logical_address
+
+    @ecu_logical_address.setter
+    def ecu_logical_address(self, addr):
+        self._ecu_logical_address = addr

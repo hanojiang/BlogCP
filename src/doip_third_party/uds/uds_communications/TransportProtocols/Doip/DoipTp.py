@@ -97,5 +97,11 @@ class DoipTp(iTp):
         if 'use_secure' in kwargs:
             self.__config['DoIP']['useSecure'] = 'True' if kwargs['use_secure'] else 'False'
 
-    def get_lcoal_doip_connection_info(self):
-        return self.__connection.get_local_tcp_ip_and_port()
+    # def get_lcoal_doip_connection_info(self):
+    #     return self.__connection.get_local_tcp_ip_and_port()
+
+    @property
+    def DoIPClient(self):
+        return self.__connection
+
+
