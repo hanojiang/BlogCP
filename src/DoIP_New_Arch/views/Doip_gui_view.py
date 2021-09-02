@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(498, 570)
+        MainWindow.resize(664, 608)
         self.buildConnectionButton = QAction(MainWindow)
         self.buildConnectionButton.setObjectName(u"buildConnectionButton")
         self.centralwidget = QWidget(MainWindow)
@@ -289,6 +289,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addLayout(self.horizontalLayout_8)
 
+        self.horizontalLayout_10 = QHBoxLayout()
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer)
+
+        self.applySettingButton = QPushButton(self.settingTab)
+        self.applySettingButton.setObjectName(u"applySettingButton")
+
+        self.horizontalLayout_10.addWidget(self.applySettingButton)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_10)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_6.addItem(self.verticalSpacer)
@@ -300,7 +314,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 498, 22))
+        self.menubar.setGeometry(QRect(0, 0, 664, 22))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         MainWindow.setMenuBar(self.menubar)
@@ -357,6 +371,7 @@ class Ui_MainWindow(object):
         self.testerLogicalAddressLineEdit.setText(QCoreApplication.translate("MainWindow", u"0e80", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Ecu   ", None))
         self.ecuLogicalAddressLineEdit.setText(QCoreApplication.translate("MainWindow", u"1000", None))
+        self.applySettingButton.setText(QCoreApplication.translate("MainWindow", u"\u5e94\u7528\u914d\u7f6e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingTab), QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))

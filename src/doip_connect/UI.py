@@ -11,6 +11,7 @@ import os
 class Main_Ui(Ui_MainWindow):
 
     def __init__(self, MainWindow):
+
         self.setupUi(MainWindow)
 
         self.__globalSignal = GlobalSigals()
@@ -22,6 +23,9 @@ class Main_Ui(Ui_MainWindow):
 
 
     def __init_uds_settings(self):
+        """
+
+        """
         self.__ecu_ip_address = self.ecuIpAddressLineEdit.text()
         self.__ecu_logical_address = int(self.ecuLogicalAddressLineEdit.text(), 16)
         self.__tester_ip_address = self.testerIpAddresslineEdit.text()
@@ -161,6 +165,11 @@ class Main_Ui(Ui_MainWindow):
         self.InfoPrintBrowser.clear()
 
     def __send_diagMsg_req_and_get_response(self, sid, diagData):
+        """
+
+        :param sid:
+        :param diagData:
+        """
         diagMsgReq = sid + diagData
         # self.append_msg_to_diagMsgPrintBrowser(Main_Ui.formatMsg('Tx: ', Main_Ui.get_byte_split_msg(diagMsgReq)))
         diagMsgReq = Main_Ui.str_DiagMsg2_hex(diagMsgReq)

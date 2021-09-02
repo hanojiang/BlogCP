@@ -6,3 +6,4 @@ src/gui/dist/*
 .idea/
 build/
 dist/
+*.so
