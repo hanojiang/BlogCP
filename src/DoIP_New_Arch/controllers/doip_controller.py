@@ -1,4 +1,4 @@
-from PySide2.QtCore import QObject
+from PySide2.QtCore import QObject, Slot
 from model.doip_model import Model
 
 class DoIP_Controller(QObject):
@@ -16,4 +16,8 @@ class DoIP_Controller(QObject):
 
         self._model.print_parameters()
 
-
+    @Slot()
+    def build_ecu_connect(self):
+        print('doip connect')
+        self._model.creat_uds()
+        pass
