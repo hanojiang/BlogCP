@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(664, 608)
+        MainWindow.resize(664, 611)
         self.buildConnectionButton = QAction(MainWindow)
         self.buildConnectionButton.setObjectName(u"buildConnectionButton")
         self.centralwidget = QWidget(MainWindow)
@@ -184,15 +184,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.addWidget(self.multiSendPushButton)
 
-        self.pushButton = QPushButton(self.diagTab)
-        self.pushButton.setObjectName(u"pushButton")
+        self.secAccessPushButton = QPushButton(self.diagTab)
+        self.secAccessPushButton.setObjectName(u"secAccessPushButton")
 
-        self.verticalLayout_7.addWidget(self.pushButton)
+        self.verticalLayout_7.addWidget(self.secAccessPushButton)
 
-        self.pushButton_2 = QPushButton(self.diagTab)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.portMirrorLineEdit = QLineEdit(self.diagTab)
+        self.portMirrorLineEdit.setObjectName(u"portMirrorLineEdit")
 
-        self.verticalLayout_7.addWidget(self.pushButton_2)
+        self.verticalLayout_7.addWidget(self.portMirrorLineEdit)
+
+        self.portMirrorSettingPushButton = QPushButton(self.diagTab)
+        self.portMirrorSettingPushButton.setObjectName(u"portMirrorSettingPushButton")
+
+        self.verticalLayout_7.addWidget(self.portMirrorSettingPushButton)
 
 
         self.horizontalLayout_9.addLayout(self.verticalLayout_7)
@@ -295,6 +300,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_10.addItem(self.horizontalSpacer)
 
+        self.loopbackIPSettingButton = QPushButton(self.settingTab)
+        self.loopbackIPSettingButton.setObjectName(u"loopbackIPSettingButton")
+
+        self.horizontalLayout_10.addWidget(self.loopbackIPSettingButton)
+
         self.applySettingButton = QPushButton(self.settingTab)
         self.applySettingButton.setObjectName(u"applySettingButton")
 
@@ -314,7 +324,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 664, 22))
+        self.menubar.setGeometry(QRect(0, 0, 664, 26))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         MainWindow.setMenuBar(self.menubar)
@@ -358,8 +368,8 @@ class Ui_MainWindow(object):
         self.addLinePushButton.setText(QCoreApplication.translate("MainWindow", u"Add Line", None))
         self.clearPushButton.setText(QCoreApplication.translate("MainWindow", u"Clear", None))
         self.multiSendPushButton.setText(QCoreApplication.translate("MainWindow", u"Multi Send", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Sec access", None))
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"Port mirror", None))
+        self.secAccessPushButton.setText(QCoreApplication.translate("MainWindow", u"Sec access", None))
+        self.portMirrorSettingPushButton.setText(QCoreApplication.translate("MainWindow", u"Port mirror", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.diagTab), QCoreApplication.translate("MainWindow", u"\u8bca\u65ad", None))
         self.ipSettingGroupBox.setTitle(QCoreApplication.translate("MainWindow", u"Ip Address", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Tester", None))
@@ -371,6 +381,7 @@ class Ui_MainWindow(object):
         self.testerLogicalAddressLineEdit.setText(QCoreApplication.translate("MainWindow", u"0e80", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Ecu   ", None))
         self.ecuLogicalAddressLineEdit.setText(QCoreApplication.translate("MainWindow", u"1000", None))
+        self.loopbackIPSettingButton.setText(QCoreApplication.translate("MainWindow", u"\u56de\u73afip\u8bbe\u7f6e", None))
         self.applySettingButton.setText(QCoreApplication.translate("MainWindow", u"\u5e94\u7528\u914d\u7f6e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingTab), QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
