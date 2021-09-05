@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>664</width>
-    <height>608</height>
+    <height>611</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -205,14 +205,17 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton">
+             <widget class="QPushButton" name="secAccessPushButton">
               <property name="text">
                <string>Sec access</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_2">
+             <widget class="QLineEdit" name="portMirrorLineEdit"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="portMirrorSettingPushButton">
               <property name="text">
                <string>Port mirror</string>
               </property>
@@ -339,6 +342,13 @@
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="loopbackIPSettingButton">
+            <property name="text">
+             <string>回环ip设置</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="applySettingButton">
             <property name="text">
              <string>应用配置</string>
@@ -372,7 +382,7 @@
      <x>0</x>
      <y>0</y>
      <width>664</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
