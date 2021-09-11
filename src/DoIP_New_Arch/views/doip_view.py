@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QMainWindow, QAction, QTableWidgetItem
+from PySide2.QtWidgets import QMainWindow, QAction, QTableWidgetItem, QFormLayout, QLabel, QLineEdit
 from PySide2.QtCore import Slot
 from views.Doip_gui_view import Ui_MainWindow
 from controllers.doip_controller import DoIP_Controller
@@ -39,6 +39,7 @@ class MainView(QMainWindow):
     def __init_all_components(self):
         self.__init_sidSeclectBox()
         self.__init_ecuSeclectBox()
+        self.__init_logitic_data_read_table()
         self.__set_pushbutton_status(False)
 
     def __init_sidSeclectBox(self):
@@ -46,6 +47,27 @@ class MainView(QMainWindow):
 
     def __init_ecuSeclectBox(self):
         self._ui.ecuSeclectBox.addItems(get_all_ecu())
+
+    def __init_logitic_data_read_table(self):
+
+        # for did in logitic_data_did:
+        #     self._controller.send_diag_msg('22', ecuAddr, did)
+        did_cnt = 0
+        for did, did_info in logitic_data_did.items():
+
+            label_did = QLabel(self._ui.logiticDataTab)
+            label_did.setObjectName(u"label_" + did)
+            label_did.setText(did+'(' + did_info + ')')
+            self._ui.formLayout.setWidget(did_cnt, QFormLayout.LabelRole, label_did)
+
+            lineEdit_did = QLineEdit(self._ui.logiticDataTab)
+            lineEdit_did.setObjectName(u"lineEdit_" + did)
+
+            self._ui.formLayout.setWidget(did_cnt, QFormLayout.FieldRole, lineEdit_did)
+
+            did_cnt = did_cnt + 1
+
+
 
     def __set_pushbutton_status(self, isEnable):
         self._ui.sendDiagMsgButton.setEnabled(isEnable)
@@ -65,7 +87,8 @@ class MainView(QMainWindow):
         self._ui.multiSendPushButton.clicked.connect(self.__on_multi_line_send_PushButton_pressed)
         self._ui.secAccessPushButton.clicked.connect(self.__on_secAccessPushButton_pressed)
         self._ui.portMirrorSettingPushButton.clicked.connect(self.__on_portMirrorSettingPushButton_pressed)
-
+        self._ui.diagReqMsgLineEdit.returnPressed.connect(self.__on_sendDiagMsgButton_pressed)
+        self._ui.logiticDataReadPushButton.clicked.connect(self.__on_logiticDataReadPushButton_pressed)
 
         self._model.sig_testerIpAddresslineEdit_changed.connect(self.__on_testerIpAddresslineEdit_changed)
         self._model.sig_diagMsgSendButton_changed.connect(self.__set_pushbutton_status)
@@ -155,3 +178,21 @@ class MainView(QMainWindow):
         self._controller.send_diag_msg('27', ecuAddr, '01')
         self._controller.send_diag_msg('2E', ecuAddr, 'CE06'+portMirror)
         self._controller.send_diag_msg('11', ecuAddr, '01')
+
+    @Slot()
+    def __on_logiticDataReadPushButton_pressed(self):
+        self.__clear_logiticData_lineEdit()
+        for did, did_info in logitic_data_did.items():
+            ecuAddr = self.get_ecu_logical_address()
+            resp = self._controller.send_diag_msg('22', ecuAddr, did)
+            # print(resp[1:])
+            rest_str = self._model.hex_DiagMsg2_str(resp[1:])
+            lineEdit: QLineEdit = self._ui.logiticDataTab.findChild(QLineEdit, u"lineEdit_"+did)
+            if lineEdit is not None:
+                # print(rest_str)
+                lineEdit.setText(rest_str.upper())
+
+    def __clear_logiticData_lineEdit(self):
+        for did, did_info in logitic_data_did.items():
+            lineEdit: QLineEdit = self._ui.logiticDataTab.findChild(QLineEdit, u"lineEdit_" + did)
+            lineEdit.setText('')

@@ -18,6 +18,9 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(664, 611)
+        icon = QIcon()
+        icon.addFile(u"UDS14229_icon.png", QSize(), QIcon.Normal, QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.buildConnectionButton = QAction(MainWindow)
         self.buildConnectionButton.setObjectName(u"buildConnectionButton")
         self.centralwidget = QWidget(MainWindow)
@@ -318,13 +321,33 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.addItem(self.verticalSpacer)
 
         self.tabWidget.addTab(self.settingTab, "")
+        self.logiticDataTab = QWidget()
+        self.logiticDataTab.setObjectName(u"logiticDataTab")
+        self.verticalLayout_8 = QVBoxLayout(self.logiticDataTab)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.formLayout = QFormLayout()
+        self.formLayout.setObjectName(u"formLayout")
+
+        self.verticalLayout_8.addLayout(self.formLayout)
+
+        self.horizontalLayout_11 = QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.logiticDataReadPushButton = QPushButton(self.logiticDataTab)
+        self.logiticDataReadPushButton.setObjectName(u"logiticDataReadPushButton")
+
+        self.horizontalLayout_11.addWidget(self.logiticDataReadPushButton)
+
+
+        self.verticalLayout_8.addLayout(self.horizontalLayout_11)
+
+        self.tabWidget.addTab(self.logiticDataTab, "")
 
         self.verticalLayout_3.addWidget(self.tabWidget)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 664, 26))
+        self.menubar.setGeometry(QRect(0, 0, 664, 22))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         MainWindow.setMenuBar(self.menubar)
@@ -384,6 +407,8 @@ class Ui_MainWindow(object):
         self.loopbackIPSettingButton.setText(QCoreApplication.translate("MainWindow", u"\u56de\u73afip\u8bbe\u7f6e", None))
         self.applySettingButton.setText(QCoreApplication.translate("MainWindow", u"\u5e94\u7528\u914d\u7f6e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingTab), QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
+        self.logiticDataReadPushButton.setText(QCoreApplication.translate("MainWindow", u"\u8bfb\u53d6\u7269\u6d41\u6570\u636e", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.logiticDataTab), QCoreApplication.translate("MainWindow", u"\u7269\u6d41\u6570\u636e", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi

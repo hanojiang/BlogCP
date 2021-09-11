@@ -25,7 +25,9 @@ class DoIP_Controller(QObject):
     def send_diag_msg(self, sid, ecuAddr, content):
         self._model.ecu_logical_address = ecuAddr
         content = self._model.get_byte_split_msg(content)
-        self._model.send_diagMsg_req_and_get_response(sid, content)
+        resp = self._model.send_diagMsg_req_and_get_response(sid, content)
+
+        return resp
 
     # @Slot()
     # def on_applySettingButton_pressed(self):

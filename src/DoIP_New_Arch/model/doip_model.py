@@ -1,4 +1,5 @@
 from PySide2.QtCore import QObject, Signal
+from PySide2.QtWidgets import QApplication
 from uds import Uds
 from ctypes import *
 import os
@@ -81,10 +82,11 @@ class Model(QObject):
 
     def send_diagMsg_req_and_get_response(self, sid, diagContent):
         print(sid + diagContent)
-
+        self._client.tp.setEcuLogicalAddress(self.ecu_logical_address)
         diagMsgReq = sid + diagContent
         diagMsgReq = Model.str_DiagMsg2_hex(diagMsgReq)
 
+        resp = []
         if diagMsgReq:
             if diagMsgReq[0] == 0x27 and diagMsgReq[1] == 0x01:
                 response = self.__send_doip_msg(diagMsgReq)
@@ -94,14 +96,18 @@ class Model(QObject):
                     reqWithKey.extend(key)
                     self.__send_doip_msg(reqWithKey)
             else:
-                self.__send_doip_msg(diagMsgReq)
+                resp = self.__send_doip_msg(diagMsgReq)
+
+        return resp
 
     def __send_doip_msg(self, diagMsgReq):
         # print((diagMsgReq))
         self.sig_DiagMsgPrintBrowser_changed.emit('Tx: ' + self.hex_DiagMsg2_str(diagMsgReq))
+        QApplication.processEvents()
         response = self._client.send(diagMsgReq)
         # print(response)
         self.sig_DiagMsgPrintBrowser_changed.emit('Rx: ' + self.hex_DiagMsg2_str(response))
+        QApplication.processEvents()
         # self.__print_req_response_to_diagMsgPrintBrowser(diagMsgReq, response)
         return response
 
@@ -144,7 +150,7 @@ class Model(QObject):
         return ' '.join(diagRespData)
 
 def keyGen(seed_input):
-    #print(os.getcwd())
+    print(os.getcwd())
     lib = cdll.LoadLibrary(os.getcwd() + '\libkeygen.so')
     seed_data = c_char * 4
     seed = seed_data()
