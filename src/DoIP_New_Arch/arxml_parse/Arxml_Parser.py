@@ -7,7 +7,19 @@ class Arxml_Parser:
         self._file_name = fileName
         self._name_space = {'test_ns':'http://autosar.org/schema/r4.0'}
         self._root = self.get_arxml_root()
+        self._pdus = self._init_pdus()
 
+    def _init_pdus(self):
+        pdus = {}
+        pdu_list = self.get_pdu()
+        for pdu in pdu_list:
+            pdu_info = self.parsePdu(pdu)
+            pdus[pdu_info['pdu_name']] = pdu_info
+
+        return pdus
+
+    def get_pdu_info_by_pduname(self, pduname):
+        return self._pdus[pduname]
 
     def get_fibex_element_by_class(self):
         fibex_element = self._root.xpath('.//test_ns:FIBEX-ELEMENT-REF', namespaces=self._name_space)
@@ -34,7 +46,7 @@ class Arxml_Parser:
     def get_PR_port(self):
         sender_receiver = self._root.xpath('.//test_ns:SENDER-RECEIVER-TO-SIGNAL-MAPPING', namespaces=self._name_space)
         # sender_receiver = self._root.xpath('.//test_ns:SYSTEM-SIGNAL-REF', namespaces=self._name_space)
-        print(len(sender_receiver))
+        # print(len(sender_receiver))
         # for i in sender_receiver:
             # print(i.text)
 
@@ -44,8 +56,22 @@ class Arxml_Parser:
         return can_frame
 
     def get_pdu(self):
-        pdu = self._root.xpath('.//test_ns:I-SIGNAL-I-PDU', namespaces=self._name_space)
-        logging.debug('pdu number is {}'.format(len(pdu)))
+        pdu = []
+        isignal_ipdu = self._root.xpath('.//test_ns:I-SIGNAL-I-PDU', namespaces=self._name_space)
+        pdu.extend(isignal_ipdu)
+        logging.debug('isignal_ipdu number is {}'.format(len(isignal_ipdu)))
+
+        n_pdu = self._root.xpath('.//test_ns:N-PDU', namespaces=self._name_space)
+        pdu.extend(n_pdu)
+        logging.debug('n_pdu number is {}'.format(len(n_pdu)))
+
+        nm_pdu = self._root.xpath('.//test_ns:NM-PDU', namespaces=self._name_space)
+        pdu.extend(nm_pdu)
+        logging.debug('nm_pdu number is {}'.format(len(nm_pdu)))
+
+        container_ipdu = self._root.xpath('.//test_ns:CONTAINER-I-PDU', namespaces=self._name_space)
+        pdu.extend(container_ipdu)
+        logging.debug('container_ipdu number is {}'.format(len(container_ipdu)))
 
         return pdu
 
@@ -71,15 +97,33 @@ class Arxml_Parser:
     def parsePdu(self, pduElement):
         pduInfo = {}
 
+        pdu_type = pduElement.tag
+        idx = pdu_type.find('}')
+        pduInfo['pdu_type'] = pdu_type[idx+1:]
+        # logging.debug(pduInfo['pdu_type'])
         pduInfo['pdu_name'] = self.get_text_value_from_tag_by_format('.//test_ns:SHORT-NAME', pduElement)
 
         pduInfo['pdu_length'] = self.str2value(self.get_text_value_from_tag_by_format('.//test_ns:LENGTH', pduElement), int)
 
         period = self.get_text_value_from_tag_by_format('.//test_ns:TIME-PERIOD/test_ns:VALUE', pduElement)
-        pduInfo['pdu_period'] = self.str2value(period, float)
+        pduInfo['period'] = int(self.str2value(period, float) * 1000)
 
-        logging.debug(pduInfo)
+        if pduInfo['period'] == 0:
+            pduInfo['period'] = self.parse_pdu_period_by_name(pduInfo['pdu_name'])
+
+        # logging.debug(pduInfo)
         return pduInfo
+
+    def parse_pdu_period_by_name(self, name):
+        idx_ms = name.find('ms')
+        if idx_ms != -1:
+            idx_ = name.rfind('_', 0, idx_ms)
+            if idx_ != -1:
+                peroid = name[idx_+1:idx_ms]
+
+                return self.str2value(peroid, int)
+        else:
+            return 0
 
     def get_can_frame_triggering(self):
         can_frame_triggering = self._root.xpath('.//test_ns:CAN-FRAME-TRIGGERING', namespaces=self._name_space)
@@ -132,12 +176,13 @@ class Arxml_Parser:
         try:
             dest = fmt(src)
         except ValueError as e:
-            logging.warning('value convert failed!')
+            # logging.debug('value convert failed!')
             dest = 0
         return dest
 
     def get_arxml_root(self):
         parser = etree.XMLParser(remove_blank_text=True)
+        etree.register_namespace('test_ns', self._name_space['test_ns'])
         tree = etree.parse(self._file_name, parser=parser)
 
         # etree.register_namespace(name, vaule)
@@ -156,7 +201,7 @@ class Arxml_Parser:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
-    ap = Arxml_Parser('SI_20210611-xx3-AS32_PPV_GW-Arxml-V05.6.arxml')
+    ap = Arxml_Parser('SI_20210816-qy1-AS32_PP_GW-Arxml-V05.7-update.arxml')
     res = ap.get_fibex_element_by_class()
 
     can_frame = res['CAN-FRAME']
@@ -172,6 +217,8 @@ if __name__ == '__main__':
     ap.get_PR_port()
     frame_list = ap.get_can_frame()
     frame_triggering_list = ap.get_can_frame_triggering()
+
+    logging.debug('frame number is {}'.format(len(frame_list)))
     ap.get_can_frame_triggering()
     ap.parseCanFrame(frame_list[0])
     ap.parseFrameTriggering(frame_triggering_list[0])
@@ -180,7 +227,8 @@ if __name__ == '__main__':
     # print(ap.str2value('0.1', float))
     # print(ap.str2value('', int))
 
-    pdu_list = ap.get_pdu()
-    for i in pdu_list:
-        ap.parsePdu(i)
+    # pdu_list = ap.get_pdu()
+    # for i in pdu_list:
+    #     ap.parsePdu(i)
 
+    # ap.parse_pdu_period_by_name('SCS_020ms_PDU15')
