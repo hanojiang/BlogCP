@@ -166,6 +166,12 @@ class Arxml_Parser:
         # print(frameInfo)
         return frameInfo
 
+    def get_Pdu_container(self):
+        ar_package = self._root.xpath('.//test_ns:AR-PACKAGE[contains(@UUID, "Communication-Pdu")]/test_ns:ELEMENTS', namespaces=self._name_space)
+        logging.debug('find pdu container length is {}'.format(len(ar_package)))
+        for pdu in ar_package[0]:
+            logging.debug((pdu.tag))
+
     def get_text_value_from_tag_by_format(self, format, tag):
         filter_element = tag.xpath(format, namespaces=self._name_space)
         filter_element_text = Arxml_Parser.getTextValue(filter_element)
@@ -232,3 +238,5 @@ if __name__ == '__main__':
     #     ap.parsePdu(i)
 
     # ap.parse_pdu_period_by_name('SCS_020ms_PDU15')
+
+    ap.get_Pdu_container()
