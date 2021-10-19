@@ -1,6 +1,7 @@
 from Utils import parseData
 from lxml import etree
 import logging
+import copy
 
 DoIPChannel_Func = {
     "ECUC-CONTAINER-VALUE": {
@@ -330,7 +331,7 @@ PduRPath = {
                 "-DEST": "ECUC-INTEGER-PARAM-DEF",
                 "#text": "/MICROSAR/PduR/PduRRoutingTables/PduRRoutingTable/PduRRoutingPath/PduRSrcPdu/PduRSourcePduHandleId"
               },
-              # "VALUE": ""
+              "VALUE": "65535"
             },
             "ECUC-TEXTUAL-PARAM-VALUE": {
               "DEFINITION-REF": {
@@ -377,7 +378,7 @@ PduRPath = {
                 "-DEST": "ECUC-INTEGER-PARAM-DEF",
                 "#text": "/MICROSAR/PduR/PduRRoutingTables/PduRRoutingTable/PduRRoutingPath/PduRDestPdu/PduRDestPduHandleId"
               },
-              # "VALUE": ""
+              "VALUE": "65535"
             },
             "ECUC-TEXTUAL-PARAM-VALUE": [
               {
@@ -817,7 +818,7 @@ def xml_write(et, filename):
     tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
 def creat_phy_pudr_path_req(mcu_name, mcu_can, local_or_remote, global_pdu, pdu_key):
-    pudrPath_tmp = PduRPath
+    pudrPath_tmp = copy.deepcopy(PduRPath)
     pudrPath_tmp['ECUC-CONTAINER-VALUE']['SHORT-NAME'] = 'DoIP_Tester2{}_Phys_Req_{}'.format(mcu_name,
                                                                                               local_or_remote)
     logging.debug('GENERATE PUDR PATH: DoIP_Tester2{}_Phys_Req_{}'.format(mcu_name, local_or_remote))
@@ -834,18 +835,20 @@ def creat_phy_pudr_path_req(mcu_name, mcu_can, local_or_remote, global_pdu, pdu_
         'ECUC-REFERENCE-VALUE'][0]['VALUE-REF']['#text'] = '/ActiveEcuC/EcuC/EcucPduCollection/{}'.format(
         global_pdu[pdu_key])
     pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
-        'ECUC-REFERENCE-VALUE'][1]['VALUE-REF']['#text'] = '/ActiveEcuC/PduR/PduRRoutingTables/PduRQueue_req_{}'.format(
+        'ECUC-REFERENCE-VALUE'][2]['VALUE-REF']['#text'] = '/ActiveEcuC/PduR/PduRRoutingTables/PduRQueue_req_{}'.format(
         mcu_can)
     if mcu_name == 'GW':
         pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
-            'ECUC-REFERENCE-VALUE'][2]['VALUE-REF']['#text'] = '/ActiveEcuC/PduR/Dcm'
-
-
+            'ECUC-REFERENCE-VALUE'][1]['VALUE-REF']['#text'] = '/ActiveEcuC/PduR/Dcm'
+        pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
+            'ECUC-REFERENCE-VALUE'][0]['VALUE-REF']['#text'] = '/ActiveEcuC/EcuC/EcucPduCollection/DCM_UDS_{}_PhysReq_Rx'.format(local_or_remote)
+        pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
+            'ECUC-REFERENCE-VALUE'][2]['VALUE-REF']['#text'] = ''
     return pudrPath_tmp
 
 def creat_phy_pudr_path_resp(mcu_name, mcu_can, local_or_remote, global_pdu, pdu_key):
 
-    pudrPath_tmp = PduRPath
+    pudrPath_tmp = copy.deepcopy(PduRPath)
     # pudrPath_tmp['ECUC-CONTAINER-VALUE']['SHORT-NAME'] = 'DoIP_Tester2{}_Phys_Req_{}'.format(mcu_name,local_or_remote)
     pudrPath_tmp['ECUC-CONTAINER-VALUE']['SHORT-NAME'] = 'DoIP_{}2Tester_Phys_Resp_{}'.format(mcu_name, local_or_remote)
     logging.debug('GENERATE PUDR PATH: DoIP_{}2Tester_Phys_Resp_{}'.format(mcu_name, local_or_remote))
@@ -866,8 +869,9 @@ def creat_phy_pudr_path_resp(mcu_name, mcu_can, local_or_remote, global_pdu, pdu
         'ECUC-REFERENCE-VALUE'][0]['VALUE-REF']['#text'] = '/ActiveEcuC/EcuC/EcucPduCollection/DCM_DoIP_{}_PhysResp_{}_Tx'.format(local_or_remote, mcu_name)
 
     pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
-        'ECUC-REFERENCE-VALUE'][2]['VALUE-REF']['#text'] = '/ActiveEcuC/PduR/DoIP'
-
+        'ECUC-REFERENCE-VALUE'][1]['VALUE-REF']['#text'] = '/ActiveEcuC/PduR/DoIP'
+    pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
+        'ECUC-REFERENCE-VALUE'][2]['VALUE-REF']['#text'] = ''#queue
 
     return pudrPath_tmp
 
@@ -875,7 +879,7 @@ def creat_func_pudr_path( mcu_name, local_or_remote):
     if mcu_name != 'GW':
         pass
     else:
-        pudrPath_tmp = PduRPath
+        pudrPath_tmp = copy.deepcopy(PduRPath)
         pudrPath_tmp['ECUC-CONTAINER-VALUE']['SHORT-NAME'] = 'DoIP_Tester2{}_Func_Req_{}'.format(mcu_name,
                                                                                              local_or_remote)
         logging.debug('GENERATE PUDR PATH: DoIP_Tester2{}_Func_Req_{}'.format(mcu_name,local_or_remote))
@@ -892,7 +896,10 @@ def creat_func_pudr_path( mcu_name, local_or_remote):
             'ECUC-REFERENCE-VALUE'][0]['VALUE-REF']['#text'] = '/ActiveEcuC/EcuC/EcucPduCollection/DCM_UDS_{}_FuncReq_Rx'.format(local_or_remote)
         pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
                 'ECUC-REFERENCE-VALUE'][1]['VALUE-REF']['#text'] = '/ActiveEcuC/PduR/Dcm'
+        pudrPath_tmp['ECUC-CONTAINER-VALUE']['SUB-CONTAINERS']['ECUC-CONTAINER-VALUE'][1]['REFERENCE-VALUES'][
+            'ECUC-REFERENCE-VALUE'][2]['VALUE-REF']['#text'] = ''  # queue
 
+        # print(pudrPath_tmp)
     return pudrPath_tmp
 
 def creat_new_pudr_path(mcu_node_dir, diag_pdus, is_remote=True):
@@ -911,8 +918,11 @@ def creat_new_pudr_path(mcu_node_dir, diag_pdus, is_remote=True):
         pdur_path_phy = creat_phy_pudr_path_req(mcu_name, mcu_can, local_or_remote_str, diag_pdus, pdu_key)
         pdur_path_func = creat_func_pudr_path(mcu_name, local_or_remote_str)
         pdur_path_phy_resp = creat_phy_pudr_path_resp(mcu_name, mcu_can, local_or_remote_str, diag_pdus, pdu_key)
-        pdur_path_ret.append(pdur_path_phy)
-        pdur_path_ret.append(pdur_path_phy_respg)
+        # print(pdur_path_phy)
+        # print(pdur_path_func)
+        # print(pdur_path_phy_resp)
+        pdur_path_ret.append(pdur_path_phy)# 使用deep copy ,负责list中存放相同的字典值
+        pdur_path_ret.append(pdur_path_phy_resp)
         pdur_path_ret.append(pdur_path_func)
     else:
         pdu_key = '{}_PhysReq_Tx'.format(mcu_name)

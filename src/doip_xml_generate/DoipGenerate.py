@@ -205,7 +205,7 @@ class PdurGenerate(GenerateBase):
         for is_remote in range(2):
             for node_dir in self.ecu_node:
                 path_dir = creat_new_pudr_path(node_dir, diag_pdus, is_remote=is_remote)
-                # logging.debug(len(path_dir))
+                logging.debug(len(path_dir))
                 for path_dir_tmp in path_dir:
                     path = etree.Element('ECUC-CONTAINER-VALUE')
                     parseData(path_dir_tmp['ECUC-CONTAINER-VALUE'], path)
@@ -233,10 +233,80 @@ class PdurGenerate(GenerateBase):
 
         return diag_can_pdus
 
+
+class PudrParser(ArxmlBase):
+
+    def __init__(self, project, fileName, diag_can_pdu):
+        super().__init__(fileName)
+        self._diag_can_pdu = diag_can_pdu
+        self.get_ecu_node(project)
+        self.generate_all_can_node_response()
+        self.xml_write_to_file('GW04_PduR_Add_DoIP_Response.arxml')
+
+    def find_Can_Node_Resp_DestPath_locate_subcontainer(self, node_name):
+        pdu_key_str = '{}_PhysResp_Rx'.format(node_name)
+        src_pdu = self.get_first_child_by_xpath(self.arxml_root, '//test_ns:VALUE-REF[contains(text(), "{}")]'.format(self._diag_can_pdu[pdu_key_str]))
+        # get subcontainer contain all src and dest pdur path
+        # subcontainer = src_pdu.getparent().getparent().getparent().getparent()
+        subcontainer = src_pdu.getparent().getparent().getparent().getparent()
+
+        return subcontainer
+
+    def duplicate_dest_container_by_can_node(self, can_node):
+        node_name = can_node['MCU_NAME']
+        can_name = can_node['CAN_NAME']
+        subcontainer = self.find_Can_Node_Resp_DestPath_locate_subcontainer(node_name)
+
+        dest_container = None
+        for dest_tmp in subcontainer:
+            container_type = self.get_first_child_by_xpath(dest_tmp, './test_ns:DEFINITION-REF').text
+            container_type = container_type.split('/')[-1]
+            if container_type == 'PduRDestPdu':
+                dest_container = dest_tmp
+                break
+
+
+        for is_remote in ['Local', 'Remote']:
+            dest_container_cpy = copy.deepcopy(dest_container)
+            # 去掉UUID属性值dest_container_cpy.attrib['UUID']
+            dest_container_cpy.attrib.pop('UUID')
+            dest_name = self.get_first_child_by_xpath(dest_container_cpy, './test_ns:SHORT-NAME')
+            dest_name.text = 'PduRDestPdu_{}_{}_Phys_Resp_Tx'.format(is_remote, node_name)
+            dest_id = self.get_first_child_by_xpath(dest_container_cpy, '//test_ns:VALUE')
+            dest_id.text = '65535'
+            ref_value_containers = self.get_all_childs_by_xpath(dest_container_cpy, './test_ns:REFERENCE-VALUES/test_ns:ECUC-REFERENCE-VALUE/test_ns:VALUE-REF')
+            if len(ref_value_containers) == 3:
+                ref_value_containers[0].text = '/ActiveEcuC/EcuC/EcucPduCollection/DCM_DoIP_{}_PhysResp_{}_Tx'.format(is_remote, node_name)
+                ref_value_containers[1].text = '/ActiveEcuC/PduR/DoIP'
+                ref_value_containers[2].text = '/ActiveEcuC/PduR/PduRRoutingTables/PduRQueue_resp_{}'.format(can_name)
+                subcontainer.append(dest_container_cpy)
+            else:
+                logging.error('CAN NODE {} DOIP RESPONSE DEST PUDR PATH ATTRIBUTE ERROR'.format(node_name))
+
+
+            # logging.error('CAN NODE DOIP RESPONSE DEST PUDR PATH GENERATE ERROR!, CAN NODE IS {}'.format(node_name))
+
+    def get_ecu_node(self, project):
+        # logging.debug(project)
+        if project == 'AS32':
+            self.ecu_node = GW04_ALL_NODE_AS32
+        elif project == 'AS33':
+            self.ecu_node = GW04_ALL_NODE_AS33
+
+    def generate_all_can_node_response(self):
+        for ecu_node in self.ecu_node:
+            if ecu_node['MCU_NAME'] == 'GW':
+                continue
+            else:
+                self.duplicate_dest_container_by_can_node(ecu_node)
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     project = 'AS33'
     doip_generate = DoIPGenerate(project)
     ecuc_generate = EcucGenerate(project)
     pdur_generate = PdurGenerate(project)
-    pdur_generate.get_ecuc_pdu_with_uuid('AS33_GW04_EcuC_ecuc.arxml')
+    diag_can_pdu = pdur_generate.get_ecuc_pdu_with_uuid('AS33_GW04_EcuC_ecuc.arxml')
+    # logging.debug(diag_can_pdu)
+
+    pdur_parser = PudrParser(project, 'AS33_GW04_PduR_ecuc.arxml', diag_can_pdu)
