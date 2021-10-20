@@ -332,11 +332,11 @@ GW04_ALL_NODE_AS33 = [
         'LOGICAL_ADD' : 0x753
     },
 ## TO DO NODE MISSING IN COM MATRIX
-    # {
-    #     'CAN_NAME' : 'CFCAN',
-    #     'MCU_NAME' : 'FLSM',
-    #     'LOGICAL_ADD' : 0x746
-    # },
+    {
+        'CAN_NAME' : 'CFCAN',
+        'MCU_NAME' : 'MSM',
+        'LOGICAL_ADD' : 0x746
+    },
     {
         'CAN_NAME' : 'CF',
         'MCU_NAME' : 'PLCM',

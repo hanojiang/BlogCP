@@ -1,0 +1,14 @@
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[a4paper,scale=0.8,centering]{geometry}
+\usepackage{caption,subcaption}
+\usepackage{tcolorbox}
+\usepackage[colorlinks=true]{hyperref}
+\tcbuselibrary{most}
+%\newenvironment{myquotaion}{\begin{quotation}}{\end{quotation}}
+%\tcolorboxenvironment{myquotaion}
+%{enhanced, breakable,colback = white, colframe = cyan, colbacktitle = cyan, attach boxed title to top left = {yshift = -2mm, xshift = 5mm},boxed title style = {sharp corners},fonttitle = \sffamily\bfseries}
+\newtcolorbox{myquotation}[1]{enhanced, breakable,colback = white, colframe = cyan, colbacktitle = cyan, attach boxed title to top left = {yshift = -2mm, xshift = 5mm},boxed title style = {sharp corners},fonttitle = \bfseries,title={#1}}
+
+%\usepackage{pythonhighlight}
+\usepackage{minted}
