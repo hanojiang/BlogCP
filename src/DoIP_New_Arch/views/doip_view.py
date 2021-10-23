@@ -38,15 +38,25 @@ class MainView(QMainWindow):
 
     def __init_all_components(self):
         self.__init_sidSeclectBox()
+        self.__init_projectSeclectBox()
         self.__init_ecuSeclectBox()
+        self.__init_canSeclectBox()
         self.__init_logitic_data_read_table()
         self.__set_pushbutton_status(False)
 
     def __init_sidSeclectBox(self):
+
         self._ui.sidSeclectBox.addItems(DIAG_SID)
 
     def __init_ecuSeclectBox(self):
-        self._ui.ecuSeclectBox.addItems(get_all_ecu())
+        self._ui.ecuSeclectBox.clear()
+        self._ui.ecuSeclectBox.addItems(get_all_ecu(self._ui.projectSelectCcomboBox.currentText()))
+
+    def __init_canSeclectBox(self):
+        self._ui.canSelectComboBox.addItems(get_all_can())
+
+    def __init_projectSeclectBox(self):
+        self._ui.projectSelectCcomboBox.addItems(get_all_project())
 
     def __init_logitic_data_read_table(self):
 
@@ -72,6 +82,7 @@ class MainView(QMainWindow):
     def __set_pushbutton_status(self, isEnable):
         self._ui.sendDiagMsgButton.setEnabled(isEnable)
         self._ui.sendDoipUdpMsgButton.setEnabled(isEnable)
+        self._ui.diagRouteTestButton.setEnabled(isEnable)
         if isEnable:
             self._ui.buildConnectionButton.setText('断开连接')
         else:
@@ -89,6 +100,9 @@ class MainView(QMainWindow):
         self._ui.portMirrorSettingPushButton.clicked.connect(self.__on_portMirrorSettingPushButton_pressed)
         self._ui.diagReqMsgLineEdit.returnPressed.connect(self.__on_sendDiagMsgButton_pressed)
         self._ui.logiticDataReadPushButton.clicked.connect(self.__on_logiticDataReadPushButton_pressed)
+        self._ui.diagRouteTestButton.clicked.connect(self.__on_diagRouteTestPushButton_pressed)
+
+        self._ui.projectSelectCcomboBox.currentIndexChanged.connect(self.__on_projectSelectCcomboBox_changed)
 
         self._model.sig_testerIpAddresslineEdit_changed.connect(self.__on_testerIpAddresslineEdit_changed)
         self._model.sig_diagMsgSendButton_changed.connect(self.__set_pushbutton_status)
@@ -108,8 +122,16 @@ class MainView(QMainWindow):
 
     def get_ecu_logical_address(self):
         ecuIndex = self._ui.ecuSeclectBox.currentIndex()
-        ecuLogicAddress = get_ecu_logical_address_by_index(ecuIndex)
+        ecuLogicAddress = get_ecu_logical_address_by_index(ecuIndex, self._ui.projectSelectCcomboBox.currentText())
         return ecuLogicAddress
+
+    def get_test_can_name(self):
+        can_name = self._ui.canSelectComboBox.currentText()
+        return can_name
+
+    @Slot(int)
+    def __on_projectSelectCcomboBox_changed(self, int):
+        self.__init_ecuSeclectBox()
 
     @Slot(str)
     def __on_testerIpAddresslineEdit_changed(self, text):
@@ -196,3 +218,22 @@ class MainView(QMainWindow):
         for did, did_info in logitic_data_did.items():
             lineEdit: QLineEdit = self._ui.logiticDataTab.findChild(QLineEdit, u"lineEdit_" + did)
             lineEdit.setText('')
+
+    @Slot()
+    def __on_diagRouteTestPushButton_pressed(self):
+
+        test_can_name = self.get_test_can_name()
+
+        for node in get_all_node(self._ui.projectSelectCcomboBox.currentText()):
+            ecuAddr = node['LOGICAL_ADD']
+            canName = node['CAN_NAME']
+            ecuName = node['MCU_NAME']
+            if ecuAddr != 0x1000 and canName == test_can_name:
+                self.__on_InfoPrintBrowser_changed('Send Diag Req Msg on {} {}: 0x{:x}'.format(canName, ecuName, ecuAddr))
+                try:
+                    resp = self._controller.send_diag_msg('10', ecuAddr, '03')
+                    self.__on_InfoPrintBrowser_changed(
+                        '{} 0x{:x} Response OK'.format(ecuName, ecuAddr+8))
+                except TimeoutError as e:
+                    self.__on_InfoPrintBrowser_changed(
+                        '{} 0x{:x} Response ERROR'.format(ecuName, ecuAddr+8))

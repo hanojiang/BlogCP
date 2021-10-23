@@ -46,6 +46,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.sidSeclectBox)
 
+        self.projectSelectCcomboBox = QComboBox(self.diagTab)
+        self.projectSelectCcomboBox.setObjectName(u"projectSelectCcomboBox")
+
+        self.horizontalLayout.addWidget(self.projectSelectCcomboBox)
+
         self.ecuSeclectBox = QComboBox(self.diagTab)
         self.ecuSeclectBox.setObjectName(u"ecuSeclectBox")
 
@@ -80,10 +85,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.setStretch(0, 2)
         self.horizontalLayout.setStretch(1, 2)
-        self.horizontalLayout.setStretch(2, 8)
-        self.horizontalLayout.setStretch(3, 15)
-        self.horizontalLayout.setStretch(4, 2)
+        self.horizontalLayout.setStretch(3, 8)
+        self.horizontalLayout.setStretch(4, 15)
         self.horizontalLayout.setStretch(5, 2)
+        self.horizontalLayout.setStretch(6, 2)
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
@@ -109,15 +114,20 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.sendDoipUdpMsgButton)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.canSelectComboBox = QComboBox(self.diagTab)
+        self.canSelectComboBox.setObjectName(u"canSelectComboBox")
 
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+        self.horizontalLayout_3.addWidget(self.canSelectComboBox)
+
+        self.diagRouteTestButton = QPushButton(self.diagTab)
+        self.diagRouteTestButton.setObjectName(u"diagRouteTestButton")
+
+        self.horizontalLayout_3.addWidget(self.diagRouteTestButton)
 
         self.horizontalLayout_3.setStretch(0, 2)
         self.horizontalLayout_3.setStretch(1, 10)
         self.horizontalLayout_3.setStretch(2, 15)
         self.horizontalLayout_3.setStretch(3, 2)
-        self.horizontalLayout_3.setStretch(4, 2)
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
 
@@ -380,6 +390,7 @@ class Ui_MainWindow(object):
         self.funcAddressRadioButton.setText(QCoreApplication.translate("MainWindow", u"Func", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Type", None))
         self.sendDoipUdpMsgButton.setText(QCoreApplication.translate("MainWindow", u"Send", None))
+        self.diagRouteTestButton.setText(QCoreApplication.translate("MainWindow", u"Route Test", None))
         ___qtablewidgetitem = self.multiLineTableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"SID", None));
         ___qtablewidgetitem1 = self.multiLineTableWidget.horizontalHeaderItem(1)

@@ -30,7 +30,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,4,0">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,2,8,15,2,2">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,2,0,8,15,2,2">
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
@@ -50,6 +50,9 @@
              <string/>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="projectSelectCcomboBox"/>
           </item>
           <item>
            <widget class="QComboBox" name="ecuSeclectBox"/>
@@ -91,7 +94,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,10,15,2,2">
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,10,15,2,0,0">
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -113,17 +116,14 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+           <widget class="QComboBox" name="canSelectComboBox"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="diagRouteTestButton">
+            <property name="text">
+             <string>Route Test</string>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
          </layout>
         </item>
