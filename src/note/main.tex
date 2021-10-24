@@ -1,11 +1,27 @@
-\documentclass[UTF8]{ctexbook}
-\input{package/package_setup}
+\documentclass[cn,10pt,math=newtx,color=green]{elegantbook}
+% \input{package/package_setup}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
 \title{学习笔记}
-\date{\today}
+% \subtitle{Elegant\LaTeX{} 经典之作}
+
 \author{Wang Haojiang}
+% \institute{Elegant\LaTeX{} Program}
+\date{Dec 1, 2021}
+\version{1.0}
+\bioinfo{自定义}{信息}
+
+% \extrainfo{各人自扫门前雪，休管他人瓦上霜。—— 陈元靓}
+
+\setcounter{tocdepth}{3}
+
+\logo{logo-blue.png}
+\cover{cover.jpg}
+\definecolor{customcolor}{RGB}{32,178,170}
+\colorlet{coverlinecolor}{customcolor}
+
 \begin{document}
-	\frontmatter
 	\maketitle
+	\frontmatter
 	\tableofcontents
 	\mainmatter
 	\include{ch1/chapter1}
