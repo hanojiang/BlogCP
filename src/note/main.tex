@@ -1,5 +1,6 @@
-\documentclass[cn,10pt,math=newtx,color=green]{elegantbook}
+\documentclass[cn,10pt,math=newtx,color=blue]{elegantbook}
 % \input{package/package_setup}
+\usepackage{hyperref}
 \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
 \title{学习笔记}
 % \subtitle{Elegant\LaTeX{} 经典之作}
@@ -30,4 +31,7 @@
 	\include{ch4/chapter4}
 	\include{ch5/chapter5}
 	\include{ch6/chapter6}
+
+	\nocite{*} 
+	\printbibliography
 \end{document}

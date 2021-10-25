@@ -4,5 +4,91 @@
 
 \section{AutoSar 以太网协议簇}
 
+\subsection{链路聚合}
+链路聚合\cite{Link_Aggregation}（英语：Link Aggregation）是一个计算机网络术语，指将多个物理端口汇聚在一起，形成一个逻辑端口，
+以实现出/入流量吞吐量在各成员端口的负荷分担，交换机根据用户配置的端口负荷分担策略决定网络封包从哪个成员端口发送到对端的交换机。
+当交换机检测到其中一个成员端口的链路发生故障时，就停止在此端口上发送封包，并根据负荷分担策略在剩下的链路中重新计算报文的发送端口，
+故障端口恢复后再次担任收发端口。链路聚合在增加链路带宽、实现链路传输弹性和工程冗余等方面是一项很重要的技术。
+
+\subsubsection{链路聚合原理}
+
+\begin{itemize}
+    \item 把聚合后得到的逻辑链路称为聚合链路，把聚合链路中的每一条物理链路称为成员链路。
+    \item 把聚合后得到的逻辑端口称为聚合端口，把聚合端口中的每一个物理端口称为成员端口。
+    \item 聚合链路也被称为Eth-Trunk链路，聚合端口也被称为Eth-Trunk端口。
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{pic/20190414170741211.jpg}
+    \caption{交换机链路聚合}
+    \label{fig:switch_link_aggre}
+\end{figure}
+
+交换机A是怎样通过自己的 Eth-Trunk 端口向交换机 B 的 Eth-Trunk 端口发送帧的？
+
+\begin{enumerate}
+    \item 来自交换机A的其他端口的帧进入到Eth-Trunk端口的帧发送队列；
+    \item Eth-Trunk端口的帧分发器（FD）将这些帧按照某种算法依次发给成员端口。FD的分发顺序是：先将Frame A发给某个成员端口，再将Frame b发给某个成员端口，依次类推；
+    \item 每个成员端口按照常规方法将来自FD的帧发送到自己的物理链路上。如图\ref{fig:switch_link_aggre_transmit}所示。
+\end{enumerate}
+
+假若FD能够非常均匀的将帧分发给不同的成员端口，则 Eth-Trunk 端口的带宽就等于各成员端口的带宽之和，而 Eth-Trunk 链路的带宽就等于各成员链路的带宽之和。
+
+但是，FD 对帧的分发并不是非常均匀的，所以 \textcolor{red}{\textbf{Eth-Trunk 链路实际上能够提供的最大的链路带宽一般会小于各成员链路带宽的总和}}。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{pic/20190414171718383.jpg}
+    \caption{链路聚合数据发送}
+    \label{fig:switch_link_aggre_transmit}
+\end{figure}
+
+交换机B是怎样从自己的Eth-Trunk端口接收到来自交换机A的Eth-Trunk端口发送过来的帧？
+
+\begin{enumerate}
+    \item 每个成员端口会按照常规方式接收来自物理链路上的帧，将接收到的帧送到Eth-Trunk端口的帧收集器（FC）；
+    \item 当帧“完全进入”（指：帧的末尾也进入到FC中）到FC中后，FC会将它送至Eth-Trunk端口的帧接收队列中；
+    \item 最先完全进入FC的帧是Frame a,其次是Frame b,等等类推。
+    \item Eth-Trunk端口的帧接收队列中的帧会被依次的送往交换机B 的其他端口。
+\end{enumerate}
+
+\begin{remark}
+    链路聚合的基本原理就是“流量分担”原理：多条成员链路共同分担了聚合链路的总流量。如果聚合链路中的某一条成员链路发生故障而中断了，那么聚合链路的总流量会继续呗其他的成员链路来分担（本该由故障链路所分担的流量将会被FD转移到其他的成员链路）。
+\end{remark}
+
+\subsubsection{链路聚合乱序问题}
+所谓的乱序现象就是指：交换机B的帧接收队列中帧的排序不同于其在交换机A的帧发送队列中的顺序。乱序现象分为两种：有害乱序、无害乱序。
+有害的乱序：会多少的对网络应用程序有所影响。无害的乱序：交换机B的帧接收队列中发生的乱序现象是一种无害的乱序。
+
+聚合链路在工作的过程中，由于帧的长度有所不同，则帧的传输时间就会有所不同，有长有短的时间，同时不同的帧所经过的成员链路也可能不同，
+所有在一般情况下总是会出现乱序现象。虽然无法避免乱序现象的发生，但是可以尽可能的避免有害乱序现象的发生。
+
+避免有害乱序现象的关键是：\textbf{聚合端口的FD是怎样将帧分发给不同的成员端口的}。
+
+\subsubsection{Conversation 概念}
+一个Conversation是指由若干个帧组成的一个集合，该集合中的不同的帧在接收端的聚合端口的帧的接收队列中的先后顺序必须与它们在发送端的聚合端口的帧的发送队列中的先后顺序保持一致。如果保持了一致，则一定不会发生有害乱序现象；若没有保持一致，则一定会发生有害乱序现象。
+
+\begin{remark}
+    不同的Conversation之间的交集必须是一个空集，即同一个帧，不能既属于这个Conversation，又属于另外一个Conversation；一个帧不能不属于任何Conversation。
+\end{remark}
 
 
+聚合端口需要遵从的分发原则：
+\begin{enumerate}
+    \item 同一个Conversation中的帧，必须被分发给同一条成员端口（可避免有害乱序现象）；
+    \item 不同Conversation中的帧，可以被分发给同一个成员链路，也可以被分发给不同的成员链路（可实现流量分担）；
+\end{enumerate}
+
+图\ref{fig:switch_link_aggre_conversation_transmit}中：交换机A的聚合端口首先会对帧的发送队列中的帧进行Conversation划分，
+划分的方法是：把具有相同目的MAC地址的帧分进同一个Conversation，而且要保证同一个Conversation中的帧都具有相同的目的MAC地址。
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{pic/20190414180436629.jpg}
+    \caption{链路聚合数据Conversation发送}
+    \label{fig:switch_link_aggre_conversation_transmit}
+\end{figure}
+
+在实际的链路聚合实现中，聚合链路的FD需要根据HASA算法来定义出恰当的Conversation，然后再对不同的Conversation进行分发。（该图中的目的MAC地址被选择成用来定义Conversation的参考量）。
+
+在实际的网络环境中，聚合链路的两端的设备属性（如：交换机和路由器，等等）以及上层应用的属性，都需要称为确定Conversation的参考量的考虑因素，最终可能参考的是目的MAC地址或者源MAC地址，等等。
