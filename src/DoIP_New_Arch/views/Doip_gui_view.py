@@ -351,6 +351,50 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.addLayout(self.horizontalLayout_11)
 
         self.tabWidget.addTab(self.logiticDataTab, "")
+        self.tab = QWidget()
+        self.tab.setObjectName(u"tab")
+        self.horizontalLayout_12 = QHBoxLayout(self.tab)
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.nodeInfoTableWidget = QTableWidget(self.tab)
+        if (self.nodeInfoTableWidget.columnCount() < 3):
+            self.nodeInfoTableWidget.setColumnCount(3)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.nodeInfoTableWidget.setHorizontalHeaderItem(0, __qtablewidgetitem2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        self.nodeInfoTableWidget.setHorizontalHeaderItem(1, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.nodeInfoTableWidget.setHorizontalHeaderItem(2, __qtablewidgetitem4)
+        self.nodeInfoTableWidget.setObjectName(u"nodeInfoTableWidget")
+
+        self.horizontalLayout_12.addWidget(self.nodeInfoTableWidget)
+
+        self.verticalLayout_9 = QVBoxLayout()
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.label_9 = QLabel(self.tab)
+        self.label_9.setObjectName(u"label_9")
+
+        self.verticalLayout_9.addWidget(self.label_9)
+
+        self.prjSelectComboBox = QComboBox(self.tab)
+        self.prjSelectComboBox.setObjectName(u"prjSelectComboBox")
+
+        self.verticalLayout_9.addWidget(self.prjSelectComboBox)
+
+        self.generateCfgPushButton = QPushButton(self.tab)
+        self.generateCfgPushButton.setObjectName(u"generateCfgPushButton")
+
+        self.verticalLayout_9.addWidget(self.generateCfgPushButton)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_9.addItem(self.verticalSpacer_2)
+
+
+        self.horizontalLayout_12.addLayout(self.verticalLayout_9)
+
+        self.horizontalLayout_12.setStretch(0, 4)
+        self.horizontalLayout_12.setStretch(1, 1)
+        self.tabWidget.addTab(self.tab, "")
 
         self.verticalLayout_3.addWidget(self.tabWidget)
 
@@ -420,6 +464,15 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingTab), QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
         self.logiticDataReadPushButton.setText(QCoreApplication.translate("MainWindow", u"\u8bfb\u53d6\u7269\u6d41\u6570\u636e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.logiticDataTab), QCoreApplication.translate("MainWindow", u"\u7269\u6d41\u6570\u636e", None))
+        ___qtablewidgetitem2 = self.nodeInfoTableWidget.horizontalHeaderItem(0)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"ECU", None));
+        ___qtablewidgetitem3 = self.nodeInfoTableWidget.horizontalHeaderItem(1)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"\u903b\u8f91\u5730\u5740", None));
+        ___qtablewidgetitem4 = self.nodeInfoTableWidget.horizontalHeaderItem(2)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"\u6240\u5728CAN", None));
+        self.label_9.setText(QCoreApplication.translate("MainWindow", u"\u9879\u76ee\u9009\u62e9", None))
+        self.generateCfgPushButton.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u914d\u7f6e", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u751f\u6210", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi

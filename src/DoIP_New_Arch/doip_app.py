@@ -3,7 +3,11 @@ from PySide2.QtWidgets import QApplication
 from model.doip_model import Model
 from controllers.doip_controller import DoIP_Controller
 from views.doip_view import MainView
+import logging
 
+# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename='./output/generate_file.log', format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]',
+                    level = logging.DEBUG, filemode='w',datefmt='%Y-%m-%d%I:%M:%S %p')
 
 class App(QApplication):
     def __init__(self, sys_argv):

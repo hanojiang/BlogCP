@@ -1,9 +1,11 @@
-from PySide2.QtWidgets import QMainWindow, QAction, QTableWidgetItem, QFormLayout, QLabel, QLineEdit
+from PySide2.QtWidgets import QMainWindow, QAction, QTableWidgetItem, QFormLayout, QLabel, QLineEdit, QListWidgetItem, QFileDialog
 from PySide2.QtCore import Slot
 from views.Doip_gui_view import Ui_MainWindow
 from controllers.doip_controller import DoIP_Controller
 from model.doip_model import Model
 from Ecu_Const import *
+from xml_generate.DoipGenerate import *
+import logging
 
 class MainView(QMainWindow):
     def __init__(self, model:Model, controller:DoIP_Controller):
@@ -18,6 +20,7 @@ class MainView(QMainWindow):
 
         self.__init_all_components()
         self.__init_all_actions()
+
 
     @Slot()
     def set_doip_parameter(self):
@@ -41,6 +44,7 @@ class MainView(QMainWindow):
         self.__init_projectSeclectBox()
         self.__init_ecuSeclectBox()
         self.__init_canSeclectBox()
+        self.__init_ecuNodeInfoListWidget()
         self.__init_logitic_data_read_table()
         self.__set_pushbutton_status(False)
 
@@ -52,11 +56,27 @@ class MainView(QMainWindow):
         self._ui.ecuSeclectBox.clear()
         self._ui.ecuSeclectBox.addItems(get_all_ecu(self._ui.projectSelectCcomboBox.currentText()))
 
+    def __init_ecuNodeInfoListWidget(self):
+        self._ui.nodeInfoTableWidget.setRowCount(0)
+        ecu_node_infos = get_all_node(self._ui.prjSelectComboBox.currentText())
+
+        for node in ecu_node_infos:
+            rowCnt = self._ui.nodeInfoTableWidget.rowCount()
+            ecu_name = node['MCU_NAME']
+            can_name = node['CAN_NAME']
+            log_addr = '0x{:x}'.format(node['LOGICAL_ADD'])
+
+            self._ui.nodeInfoTableWidget.insertRow(rowCnt)
+            self._ui.nodeInfoTableWidget.setItem(rowCnt, 0, QTableWidgetItem(ecu_name))
+            self._ui.nodeInfoTableWidget.setItem(rowCnt, 1, QTableWidgetItem(log_addr))
+            self._ui.nodeInfoTableWidget.setItem(rowCnt, 2, QTableWidgetItem(can_name))
+
     def __init_canSeclectBox(self):
         self._ui.canSelectComboBox.addItems(get_all_can())
 
     def __init_projectSeclectBox(self):
         self._ui.projectSelectCcomboBox.addItems(get_all_project())
+        self._ui.prjSelectComboBox.addItems(get_all_project())
 
     def __init_logitic_data_read_table(self):
 
@@ -101,8 +121,11 @@ class MainView(QMainWindow):
         self._ui.diagReqMsgLineEdit.returnPressed.connect(self.__on_sendDiagMsgButton_pressed)
         self._ui.logiticDataReadPushButton.clicked.connect(self.__on_logiticDataReadPushButton_pressed)
         self._ui.diagRouteTestButton.clicked.connect(self.__on_diagRouteTestPushButton_pressed)
+        self._ui.generateCfgPushButton.clicked.connect(self.__on_generateCfgPushButton_pressed)
+        # self._ui.ecucFileSelectPushButton.clicked.connect(self.__on_ecucFileSelectPushButton_pressed)
 
         self._ui.projectSelectCcomboBox.currentIndexChanged.connect(self.__on_projectSelectCcomboBox_changed)
+        self._ui.prjSelectComboBox.currentIndexChanged.connect(self.__on_genTabPrjSelectCcomboBox_changed)
 
         self._model.sig_testerIpAddresslineEdit_changed.connect(self.__on_testerIpAddresslineEdit_changed)
         self._model.sig_diagMsgSendButton_changed.connect(self.__set_pushbutton_status)
@@ -132,6 +155,10 @@ class MainView(QMainWindow):
     @Slot(int)
     def __on_projectSelectCcomboBox_changed(self, int):
         self.__init_ecuSeclectBox()
+
+    @Slot(int)
+    def __on_genTabPrjSelectCcomboBox_changed(self, int):
+        self.__init_ecuNodeInfoListWidget()
 
     @Slot(str)
     def __on_testerIpAddresslineEdit_changed(self, text):
@@ -237,3 +264,22 @@ class MainView(QMainWindow):
                 except TimeoutError as e:
                     self.__on_InfoPrintBrowser_changed(
                         '{} 0x{:x} Response ERROR'.format(ecuName, ecuAddr+8))
+
+
+    @Slot()
+    def __on_generateCfgPushButton_pressed(self):
+        project = self._ui.prjSelectComboBox.currentText()
+
+        ecuc_file_choose = QFileDialog.getOpenFileName(self,"选取EcuC文件", os.getcwd(), "Arxml Files (*.arxml);;All Files (*)")  # 起始路径
+        pdur_file_choose = QFileDialog.getOpenFileName(self,"选取PDUR文件", os.getcwd(), "Arxml Files (*.arxml);;All Files (*)")  # 起始路径
+
+        if ecuc_file_choose[0] == '' or pdur_file_choose[0] == '':
+            return
+
+        logging.debug('ECUC FILE CHOOSE: ' + ecuc_file_choose[0])
+        logging.debug('PDUR FILE CHOOSE: ' + pdur_file_choose[0])
+        doip_generate = DoIPGenerate(project)
+        ecuc_generate = EcucGenerate(project)
+        pdur_generate = PdurGenerate(project, ecuc_file_choose[0])
+        pdur_parser = PudrParser(project, pdur_file_choose[0], pdur_generate.diag_pdus)
+
