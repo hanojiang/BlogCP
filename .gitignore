@@ -8,3 +8,7 @@ build/
 dist/
 *.so
 .idea/
+src/ArxmlNetSignalInfoExportTool-master/*
+src/DoIP_New_Arch/arxml/*
+src/DoIP_New_Arch/arxml_parse/*
+*.iml
