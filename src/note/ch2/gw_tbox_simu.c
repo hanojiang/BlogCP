@@ -1,5 +1,3 @@
-% \begin{lstlisting}[language=C]
-
 /*@!Encoding:936*/
 // ---------------------------------------------------
 // node global variables.
@@ -375,5 +373,3 @@ void startReceive ( dword socket, char buffer[] )
     writeLineEx( 1, 3, "S: TcpReceive error %d", result);
   }
 }
-
-% \end{lstlisting}

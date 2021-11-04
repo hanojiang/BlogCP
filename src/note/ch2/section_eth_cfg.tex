@@ -145,4 +145,11 @@
     \item 等待 20s后，停发唤醒信号和以太网激活信号。
     \item 等待 60s后，网络应当休眠，重启计数器，循环上述过程。
 \end{enumerate}
-\input{ch2/gw_tbox_simu.tex}
+
+\lstinputlisting[
+    style       =   C,
+    % language = CAPL,
+    language = C,
+    caption     =   {仿真代码示例},
+    % label       =   {ff.py}
+]{ch2/gw_tbox_simu.c}
