@@ -2,7 +2,9 @@
 以太网通信相较于传统的车载通信方式，如 CAN、LIN 等，具有高通信速率的显著优势。
 本章将基于 AutoSar 软件架构及 Vector 工具链完成相关模块的配置，以实现基本的以太网通信。
 
-\section{AutoSar 以太网协议簇}
+\section{物理层}
+
+\section{链路层}
 
 \subsection{链路聚合}
 链路聚合\cite{Link_Aggregation}（英语：Link Aggregation）是一个计算机网络术语，指将多个物理端口汇聚在一起，形成一个逻辑端口，
@@ -92,3 +94,25 @@
 在实际的链路聚合实现中，聚合链路的FD需要根据HASA算法来定义出恰当的Conversation，然后再对不同的Conversation进行分发。（该图中的目的MAC地址被选择成用来定义Conversation的参考量）。
 
 在实际的网络环境中，聚合链路的两端的设备属性（如：交换机和路由器，等等）以及上层应用的属性，都需要称为确定Conversation的参考量的考虑因素，最终可能参考的是目的MAC地址或者源MAC地址，等等。
+
+\subsection{ENET 中断分析}
+
+ENET 由中断触发到上层数据接收并处理的过程见下图。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{pic/eth_isr.pdf}
+    \caption{ENET 中断代码调用}
+    \label{fig:enet_isr}
+\end{figure}
+
+其中 \lstinline{Eth_30_Enet_Irq.c} 中包含 \lstinline{OS} 中配置的 \lstinline{ENET} 中断处理函数：
+
+\begin{lstlisting}[language=C]
+ISR( EthIsr_EthernetCnt_MCU_Ctrl_ad7672f0_EthInterruptServiceRoutine_Q0Rx );
+ISR( EthIsr_EthernetCnt_MCU_Ctrl_ad7672f0_EthInterruptServiceRoutine_Q0Tx );
+\end{lstlisting}
+
+后续通过 \lstinline{Eth_30_Enet_Internal_Receive} 处理接收到的数据帧，其中由 \lstinline{Eth_30_Enet_Receive_ProcessValidFrame} 验证数据帧后，由 \lstinline{EthIf_RxIndication} 传至上层模块。
+
+\input{ch2/section_ip.tex}
