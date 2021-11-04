@@ -123,6 +123,8 @@ class MainView(QMainWindow):
         self._ui.diagRouteTestButton.clicked.connect(self.__on_diagRouteTestPushButton_pressed)
         self._ui.generateCfgPushButton.clicked.connect(self.__on_generateCfgPushButton_pressed)
         # self._ui.ecucFileSelectPushButton.clicked.connect(self.__on_ecucFileSelectPushButton_pressed)
+        self._ui.transformPushButton.clicked.connect(self.__on_transformPushButton_pressed)
+        self._ui.allignCompPushButton.clicked.connect(self.__on_allignCompPushButton_pressed)
 
         self._ui.projectSelectCcomboBox.currentIndexChanged.connect(self.__on_projectSelectCcomboBox_changed)
         self._ui.prjSelectComboBox.currentIndexChanged.connect(self.__on_genTabPrjSelectCcomboBox_changed)
@@ -283,3 +285,30 @@ class MainView(QMainWindow):
         pdur_generate = PdurGenerate(project, ecuc_file_choose[0])
         pdur_parser = PudrParser(project, pdur_file_choose[0], pdur_generate.diag_pdus)
 
+    def __on_transformPushButton_pressed(self):
+
+        def string2ascii(ascii_text):
+            ascii_text_list = list(ascii_text)
+            return ''.join([hex(ord(i))[2:] for i in ascii_text_list])
+
+        def ascii2string(hex_string_text):
+            hex_string_text_list = self._model.str_DiagMsg2_hex(hex_string_text)
+            return ''.join([chr(i) for i in hex_string_text_list])
+
+        ascii_input = self._ui.asciiCodeInputLineEdit.text()
+        string_input = self._ui.stringInputLineEdit.text()
+
+        if(ascii_input != ''):
+            self._ui.stringInputLineEdit.setText(ascii2string(ascii_input))
+        elif(string_input != ''):
+            self._ui.asciiCodeInputLineEdit.setText(string2ascii(string_input))
+        else:
+            pass
+
+    def __on_allignCompPushButton_pressed(self):
+        allign_address = int(self._ui.allignAddressLineEdit.text(), 16)
+        allign_size = int(self._ui.allignSizeLineEdit.text())
+        logging.debug('allign address is {}, size is {}'.format(allign_address, allign_size))
+
+        allign_result = hex((allign_address+allign_size-1)&(~(allign_size-1)))
+        self._ui.allignResultLineEdit.setText(allign_result)

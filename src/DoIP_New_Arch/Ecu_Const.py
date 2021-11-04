@@ -169,6 +169,13 @@ GW04_ALL_NODE_AS32 = [
 
 #AS33
 GW04_ALL_NODE_AS33 = [
+    # # GW04
+    # {
+    #     'CAN_NAME' : 'GW04',
+    #     'MCU_NAME' : 'GW',
+    #     'LOGICAL_ADD' : 0x1000
+    # },
+
     # CNCAN
     {
         'CAN_NAME' : 'CN',
@@ -333,7 +340,7 @@ GW04_ALL_NODE_AS33 = [
     },
 ## TO DO NODE MISSING IN COM MATRIX
     {
-        'CAN_NAME' : 'CFCAN',
+        'CAN_NAME' : 'CF',
         'MCU_NAME' : 'MSM',
         'LOGICAL_ADD' : 0x746
     },
@@ -342,8 +349,152 @@ GW04_ALL_NODE_AS33 = [
         'MCU_NAME' : 'PLCM',
         'LOGICAL_ADD' : 0x741
     },
+# GW04
+    {
+        'CAN_NAME' : 'GW04',
+        'MCU_NAME' : 'GW',
+        'LOGICAL_ADD' : 0x1000
+    },
 
-    # GW04
+]
+
+#AS33P
+GW04_ALL_NODE_AS33P = [
+
+
+    # CNCAN
+    {
+        'CAN_NAME' : 'CN',
+        'MCU_NAME' : 'TBOX',
+        'LOGICAL_ADD' : 0x711
+    },
+
+    # PTCAN FD
+    {
+        'CAN_NAME' : 'PT',
+        'MCU_NAME' : 'ECM',
+        'LOGICAL_ADD' : 0x7E0
+    },
+    {
+        'CAN_NAME' : 'PT',
+        'MCU_NAME' : 'VCU',
+        'LOGICAL_ADD' : 0x7E3
+    },
+    {
+        'CAN_NAME' : 'PT',
+        'MCU_NAME' : 'ISC',
+        'LOGICAL_ADD' : 0x7E7
+    },
+    {
+        'CAN_NAME' : 'PT',
+        'MCU_NAME' : 'BMS',
+        'LOGICAL_ADD' : 0x7E5
+    },
+    {
+        'CAN_NAME' : 'PT',
+        'MCU_NAME' : 'CCU',
+        'LOGICAL_ADD' : 0x784
+    },
+    {
+        'CAN_NAME' : 'PT',
+        'MCU_NAME' : 'SDM',
+        'LOGICAL_ADD' : 0x730
+    },
+
+    # PTEXTCAN
+    {
+        'CAN_NAME' : 'PTEXT',
+        'MCU_NAME' : 'SCU',
+        'LOGICAL_ADD' : 0x771
+    },
+    {
+        'CAN_NAME' : 'PTEXT',
+        'MCU_NAME' : 'CMM',
+        'LOGICAL_ADD' : 0x774
+    },
+
+    # CHCANFD
+    {
+        'CAN_NAME' : 'CH',
+        'MCU_NAME' : 'EPS',
+        'LOGICAL_ADD' : 0x721
+    },
+    {
+        'CAN_NAME' : 'CH',
+        'MCU_NAME' : 'SCS',
+        'LOGICAL_ADD' : 0x720
+    },
+    {
+        'CAN_NAME' : 'AD',
+        'MCU_NAME' : 'FDR',
+        'LOGICAL_ADD' : 0x734
+    },
+
+    # ADCANFD
+
+    {
+        'CAN_NAME' : 'AD',
+        'MCU_NAME' : 'FVCM',
+        'LOGICAL_ADD' : 0x733
+    },
+    {
+        'CAN_NAME' : 'AD',
+        'MCU_NAME' : 'LHRDA',
+        'LOGICAL_ADD' : 0x732
+    },
+    {
+        'CAN_NAME' : 'AD',
+        'MCU_NAME' : 'RHRDA',
+        'LOGICAL_ADD' : 0x756
+    },
+
+    ## CFCAN
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'AC',
+        'LOGICAL_ADD' : 0x750
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'AMP',
+        'LOGICAL_ADD' : 0x765
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'BCM',
+        'LOGICAL_ADD' : 0x740
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'ICM',
+        'LOGICAL_ADD' : 0x761
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'IPK',
+        'LOGICAL_ADD' : 0x760
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'ESCL',
+        'LOGICAL_ADD' : 0x742
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'PACM',
+        'LOGICAL_ADD' : 0x763
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'FLSM',
+        'LOGICAL_ADD' : 0x746
+    },
+    {
+        'CAN_NAME' : 'CF',
+        'MCU_NAME' : 'PLCM',
+        'LOGICAL_ADD' : 0x741
+    },
+# GW04
     {
         'CAN_NAME' : 'GW04',
         'MCU_NAME' : 'GW',
@@ -407,6 +558,8 @@ def get_all_node(project):
 
     elif project == 'AS33':
         GW04_ALL_NODE = GW04_ALL_NODE_AS33
+    elif project == 'AS33P':
+        GW04_ALL_NODE = GW04_ALL_NODE_AS33P
     else:
         pass
 

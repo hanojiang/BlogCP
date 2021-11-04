@@ -395,6 +395,93 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12.setStretch(0, 4)
         self.horizontalLayout_12.setStretch(1, 1)
         self.tabWidget.addTab(self.tab, "")
+        self.tab_2 = QWidget()
+        self.tab_2.setObjectName(u"tab_2")
+        self.verticalLayout_10 = QVBoxLayout(self.tab_2)
+        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.groupBox = QGroupBox(self.tab_2)
+        self.groupBox.setObjectName(u"groupBox")
+        self.formLayout_2 = QFormLayout(self.groupBox)
+        self.formLayout_2.setObjectName(u"formLayout_2")
+        self.label_10 = QLabel(self.groupBox)
+        self.label_10.setObjectName(u"label_10")
+
+        self.formLayout_2.setWidget(0, QFormLayout.LabelRole, self.label_10)
+
+        self.stringInputLineEdit = QLineEdit(self.groupBox)
+        self.stringInputLineEdit.setObjectName(u"stringInputLineEdit")
+
+        self.formLayout_2.setWidget(0, QFormLayout.FieldRole, self.stringInputLineEdit)
+
+        self.label_11 = QLabel(self.groupBox)
+        self.label_11.setObjectName(u"label_11")
+
+        self.formLayout_2.setWidget(1, QFormLayout.LabelRole, self.label_11)
+
+        self.asciiCodeInputLineEdit = QLineEdit(self.groupBox)
+        self.asciiCodeInputLineEdit.setObjectName(u"asciiCodeInputLineEdit")
+
+        self.formLayout_2.setWidget(1, QFormLayout.FieldRole, self.asciiCodeInputLineEdit)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.formLayout_2.setItem(2, QFormLayout.LabelRole, self.horizontalSpacer_2)
+
+        self.transformPushButton = QPushButton(self.groupBox)
+        self.transformPushButton.setObjectName(u"transformPushButton")
+
+        self.formLayout_2.setWidget(2, QFormLayout.FieldRole, self.transformPushButton)
+
+
+        self.verticalLayout_10.addWidget(self.groupBox)
+
+        self.groupBox_2 = QGroupBox(self.tab_2)
+        self.groupBox_2.setObjectName(u"groupBox_2")
+        self.formLayout_3 = QFormLayout(self.groupBox_2)
+        self.formLayout_3.setObjectName(u"formLayout_3")
+        self.label_12 = QLabel(self.groupBox_2)
+        self.label_12.setObjectName(u"label_12")
+
+        self.formLayout_3.setWidget(0, QFormLayout.LabelRole, self.label_12)
+
+        self.allignAddressLineEdit = QLineEdit(self.groupBox_2)
+        self.allignAddressLineEdit.setObjectName(u"allignAddressLineEdit")
+
+        self.formLayout_3.setWidget(0, QFormLayout.FieldRole, self.allignAddressLineEdit)
+
+        self.label_13 = QLabel(self.groupBox_2)
+        self.label_13.setObjectName(u"label_13")
+
+        self.formLayout_3.setWidget(1, QFormLayout.LabelRole, self.label_13)
+
+        self.allignSizeLineEdit = QLineEdit(self.groupBox_2)
+        self.allignSizeLineEdit.setObjectName(u"allignSizeLineEdit")
+
+        self.formLayout_3.setWidget(1, QFormLayout.FieldRole, self.allignSizeLineEdit)
+
+        self.label_14 = QLabel(self.groupBox_2)
+        self.label_14.setObjectName(u"label_14")
+
+        self.formLayout_3.setWidget(2, QFormLayout.LabelRole, self.label_14)
+
+        self.allignResultLineEdit = QLineEdit(self.groupBox_2)
+        self.allignResultLineEdit.setObjectName(u"allignResultLineEdit")
+
+        self.formLayout_3.setWidget(2, QFormLayout.FieldRole, self.allignResultLineEdit)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.formLayout_3.setItem(3, QFormLayout.LabelRole, self.horizontalSpacer_3)
+
+        self.allignCompPushButton = QPushButton(self.groupBox_2)
+        self.allignCompPushButton.setObjectName(u"allignCompPushButton")
+
+        self.formLayout_3.setWidget(3, QFormLayout.FieldRole, self.allignCompPushButton)
+
+
+        self.verticalLayout_10.addWidget(self.groupBox_2)
+
+        self.tabWidget.addTab(self.tab_2, "")
 
         self.verticalLayout_3.addWidget(self.tabWidget)
 
@@ -473,6 +560,16 @@ class Ui_MainWindow(object):
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"\u9879\u76ee\u9009\u62e9", None))
         self.generateCfgPushButton.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u914d\u7f6e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u751f\u6210", None))
+        self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"ASCII\u7801\u8f6c\u6362", None))
+        self.label_10.setText(QCoreApplication.translate("MainWindow", u"\u5b57\u7b26\u4e32\uff1a", None))
+        self.label_11.setText(QCoreApplication.translate("MainWindow", u"ASCII\u7801\uff1a", None))
+        self.transformPushButton.setText(QCoreApplication.translate("MainWindow", u"\u8f6c\u6362", None))
+        self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"\u5b57\u8282\u5bf9\u9f50", None))
+        self.label_12.setText(QCoreApplication.translate("MainWindow", u"\u5bf9\u9f50\u5730\u5740\uff1a", None))
+        self.label_13.setText(QCoreApplication.translate("MainWindow", u"\u5bf9\u9f50\u5927\u5c0f\uff1a", None))
+        self.label_14.setText(QCoreApplication.translate("MainWindow", u"\u5bf9\u9f50\u7ed3\u679c\uff1a", None))
+        self.allignCompPushButton.setText(QCoreApplication.translate("MainWindow", u"\u5bf9\u9f50\u8ba1\u7b97", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"\u5c0f\u5de5\u5177", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi

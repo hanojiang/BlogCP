@@ -2,7 +2,7 @@ from xml_generate.ArxmlBase import ArxmlBase
 import logging
 from xml_generate.DoipJsonFormat import *
 import copy
-from Ecu_Const import GW04_ALL_NODE_AS32, GW04_ALL_NODE_AS33
+from Ecu_Const import GW04_ALL_NODE_AS32, GW04_ALL_NODE_AS33, GW04_ALL_NODE_AS33P, get_all_node
 import os
 
 class GenerateBase:
@@ -18,11 +18,14 @@ class GenerateBase:
 
     def get_ecu_node(self, project):
         # logging.debug(project)
-        if project == 'AS32':
-            self.ecu_node = GW04_ALL_NODE_AS32
-        elif project == 'AS33':
-            self.ecu_node = GW04_ALL_NODE_AS33
+        # if project == 'AS32':
+        #     self.ecu_node = GW04_ALL_NODE_AS32
+        # elif project == 'AS33':
+        #     self.ecu_node = GW04_ALL_NODE_AS33
+        # elif project == 'AS33P':
+        #     self.ecu_node = GW04_ALL_NODE_AS33P
 
+        self.ecu_node = get_all_node(project)
     def generate_arxml(self):
         self._arxml_parse.xml_write_to_file('./output/' + self._generate_xml_file)
 
@@ -294,11 +297,11 @@ class PudrParser(ArxmlBase):
 
     def get_ecu_node(self, project):
         # logging.debug(project)
-        if project == 'AS32':
-            self.ecu_node = GW04_ALL_NODE_AS32
-        elif project == 'AS33':
-            self.ecu_node = GW04_ALL_NODE_AS33
-
+        # if project == 'AS32':
+        #     self.ecu_node = GW04_ALL_NODE_AS32
+        # elif project == 'AS33':
+        #     self.ecu_node = GW04_ALL_NODE_AS33
+        self.ecu_node = get_all_node(project)
     def generate_all_can_node_response(self):
         for ecu_node in self.ecu_node:
             if ecu_node['MCU_NAME'] == 'GW':
