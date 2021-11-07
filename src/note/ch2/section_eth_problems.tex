@@ -3,7 +3,7 @@
 \begin{introduction}
     \item \nameref{subsubsec:eth_ld_task_error}
     \item \nameref{subsubsec:eth_ld_interrupts_flash_overflow_error}
-    \item \nameref{subsec:desc_buffer_cache}
+    \item \nameref{subsubsec:desc_buffer_cache}
     \item 开启 \lstinline{cache} 及 EthRam cache smpu 保护后，程序异常 （AS33）
     \item 修改中断向量及异常向量对齐大小后程序异常 （AS33）
     \item Switch 未能正常初始化，下载配置后，端口初始化失败（AS33P）
@@ -101,7 +101,8 @@ OS_EXCVEC_CORE1_CONST 256
     \end{enumerate}
 \end{definition}
 
-\subsection{开启 \lstinline{cache} 后，Switch 未能正常初始化 （AS33）}\label{subsec:desc_buffer_cache}
+\subsection{cache 相关}
+\subsubsection{开启 \lstinline{cache} 后，Switch 未能正常初始化 （AS33）}\label{subsubsec:desc_buffer_cache}
 
 开启  \lstinline{cache} 后，Switch 未能正常初始化，但程序其他功能正常运行，\lstinline{Task} 正常调度。
 由于初期添加以太网功能时，仅将 Switch 初始化函数放置于背景任务中，其他所有的 \lstinline{MainFunction} 均未放置到 \lstinline{Task} 调度。
@@ -215,4 +216,15 @@ void Smpu_config(void)
 
 \begin{definition}[解决方案]
     将 \lstinline{.EthRam} 放置于 \lstinline{NONE_CACHE_DATA_RAM Block}中。并在 MPU 寄存器中对 \lstinline{NONE_CACHE_DATA_RAM Block} 进行首尾 ram 地址配置。
+\end{definition}
+
+\subsubsection{开启 \lstinline{cache} 及 EthRam cache smpu 保护后，程序异常 （AS33）}
+
+该问题与前述第 \ref{subsubsec:desc_buffer_cache}节问题强相关，在开启 \lstinline{cache} 后，需要对以太网缓存及描述符变量进行 MPU 保护。由于以太网相关变量占用 Ram空间较大，原来分配的非 \lstinline{cache} 块不足再分配给以太网使用，
+所以需要扩大该块的大小。需要在 \lstinline{vlinkgen} 模块中进行大小修改，并将 \lstinline{.EthRam} 放置于扩容后的 \lstinline{NONE_CACHE_DATA_RAM Block}中。
+由于 \lstinline{NONE_CACHE_DATA_RAM Block} 扩容的空间来自于 \lstinline{SYSTEM_RAM Block}。因此，需要同步缩小 \lstinline{SYSTEM_RAM Block}大小。
+同理，在 MPU 寄存器配置中，需要对可被 \lstinline{cache} 的\lstinline{SYSTEM_RAM Block}块和不被 \lstinline{cache}的 \lstinline{NONE_CACHE_DATA_RAM Block}的起始地址和末尾地址都要通过修改，\textbf{确保无重叠}。
+
+\begin{definition}[解决方案]
+    确保可被 \lstinline{cache} 的块和不被 \lstinline{cache}的块的起始地址和末尾地址\textbf{确保无重叠}。
 \end{definition}
