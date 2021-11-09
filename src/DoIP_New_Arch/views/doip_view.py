@@ -221,7 +221,7 @@ class MainView(QMainWindow):
     @Slot()
     def __on_portMirrorSettingPushButton_pressed(self):
         portMirror = self._ui.portMirrorLineEdit.text()
-        if portMirror is '':
+        if portMirror == '':
             portMirror = '80ff'
 
         ecuAddr = self.get_ecu_logical_address()
@@ -284,6 +284,10 @@ class MainView(QMainWindow):
         ecuc_generate = EcucGenerate(project)
         pdur_generate = PdurGenerate(project, ecuc_file_choose[0])
         pdur_parser = PudrParser(project, pdur_file_choose[0], pdur_generate.diag_pdus)
+
+        format_can_node_list = get_format_all_ecu_node(project)
+        # logging.debug(format_can_node_list)
+        write_to_txt(format_can_node_list, './output/ecu_info_{}.txt'.format(project))
 
     def __on_transformPushButton_pressed(self):
 

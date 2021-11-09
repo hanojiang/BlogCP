@@ -177,7 +177,7 @@ class EcucGenerate(GenerateBase):
     def append_pdus(self):
         logging.debug('**********************ECUC PDU GENERATE START**********************')
         logging.debug('ECUC: Add global pdu number is {}'.format(len(self._pdus)))
-        for pdu_name in self._pdus[1:]:
+        for pdu_name in self._pdus:
             new_pdu_container = copy.deepcopy(self._ecu_container)
             # new_pdu_container_short_name = new_pdu_container.xpath('./test_ns:SHORT-NAME', namespaces=ns)
             new_pdu_container_short_name = self._arxml_parse.get_first_child_by_xpath(new_pdu_container,
@@ -185,7 +185,9 @@ class EcucGenerate(GenerateBase):
             new_pdu_container_short_name.text = pdu_name
             logging.debug('ECUC: Add global pdu {}'.format(pdu_name))
             self._subcontainer.append(new_pdu_container)
-
+        # logging.debug('ecu subcontainer len is {}'.format(len(self._subcontainer)))
+        self._subcontainer.__delitem__(0)
+        # logging.debug('ecu subcontainer len is {}'.format(len(self._subcontainer)))
         logging.debug('**********************ECUC PDU GENERATE END**********************')
 class PdurGenerate(GenerateBase):
 
