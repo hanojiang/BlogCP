@@ -633,8 +633,8 @@ def get_all_ecu(project):
 
 def get_all_can():
 
-    allCan = ['CF', 'CN', 'PT', 'CH', 'AD', 'PTEXT']
-
+    # allCan = ['CF', 'CN', 'PT', 'CH', 'AD', 'PTEXT']
+    allCan = ['BDCAN', 'INFOCAN', 'PTCANFD', 'CHCAN2', 'CHCANFD', 'PTEXTCAN', 'ADCANFD']
     return allCan
 
 def get_all_project():
@@ -643,7 +643,7 @@ def get_all_project():
     return allProject
 
 def get_all_node(project):
-    GW04_ALL_NODE = {}
+    GW04_ALL_NODE = []
 
     if project == 'AS32':
         GW04_ALL_NODE = GW04_ALL_NODE_AS32

@@ -380,6 +380,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_9.addWidget(self.prjSelectComboBox)
 
+        self.prjImportPushButton = QPushButton(self.tab)
+        self.prjImportPushButton.setObjectName(u"prjImportPushButton")
+
+        self.verticalLayout_9.addWidget(self.prjImportPushButton)
+
         self.generateCfgPushButton = QPushButton(self.tab)
         self.generateCfgPushButton.setObjectName(u"generateCfgPushButton")
 
@@ -558,6 +563,7 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem4 = self.nodeInfoTableWidget.horizontalHeaderItem(2)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"\u6240\u5728CAN", None));
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"\u9879\u76ee\u9009\u62e9", None))
+        self.prjImportPushButton.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u5165\u9879\u76ee", None))
         self.generateCfgPushButton.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u914d\u7f6e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u751f\u6210", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"ASCII\u7801\u8f6c\u6362", None))

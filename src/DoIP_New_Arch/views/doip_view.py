@@ -54,11 +54,15 @@ class MainView(QMainWindow):
 
     def __init_ecuSeclectBox(self):
         self._ui.ecuSeclectBox.clear()
-        self._ui.ecuSeclectBox.addItems(get_all_ecu(self._ui.projectSelectCcomboBox.currentText()))
+        # self._ui.ecuSeclectBox.addItems(get_all_ecu(self._ui.projectSelectCcomboBox.currentText()))
+        self._ui.ecuSeclectBox.addItems(self._model.get_all_ecu(self._ui.projectSelectCcomboBox.currentText()))
 
     def __init_ecuNodeInfoListWidget(self):
         self._ui.nodeInfoTableWidget.setRowCount(0)
-        ecu_node_infos = get_all_node(self._ui.prjSelectComboBox.currentText())
+        ecu_node_infos = self._model.get_all_node(self._ui.prjSelectComboBox.currentText())
+
+        # if len(ecu_node_infos) == 0:
+        #     ecu_node_infos = self._import_project_ecu_node
 
         for node in ecu_node_infos:
             rowCnt = self._ui.nodeInfoTableWidget.rowCount()
@@ -72,11 +76,16 @@ class MainView(QMainWindow):
             self._ui.nodeInfoTableWidget.setItem(rowCnt, 2, QTableWidgetItem(can_name))
 
     def __init_canSeclectBox(self):
-        self._ui.canSelectComboBox.addItems(get_all_can())
+        # self._ui.canSelectComboBox.addItems(get_all_can())
+        self._ui.canSelectComboBox.addItems(self._model.get_all_can())
 
     def __init_projectSeclectBox(self):
-        self._ui.projectSelectCcomboBox.addItems(get_all_project())
-        self._ui.prjSelectComboBox.addItems(get_all_project())
+        self._ui.projectSelectCcomboBox.clear()
+        self._ui.prjSelectComboBox.clear()
+        # self._ui.projectSelectCcomboBox.addItems(get_all_project()) # tab diagnoisitic
+        self._ui.projectSelectCcomboBox.addItems(self._model.get_all_project()) # tab diagnoisitic
+        # self._ui.prjSelectComboBox.addItems(get_all_project())# tab configure generate
+        self._ui.prjSelectComboBox.addItems(self._model.get_all_project())# tab configure generate
 
     def __init_logitic_data_read_table(self):
 
@@ -125,6 +134,8 @@ class MainView(QMainWindow):
         # self._ui.ecucFileSelectPushButton.clicked.connect(self.__on_ecucFileSelectPushButton_pressed)
         self._ui.transformPushButton.clicked.connect(self.__on_transformPushButton_pressed)
         self._ui.allignCompPushButton.clicked.connect(self.__on_allignCompPushButton_pressed)
+        self._ui.prjImportPushButton.clicked.connect(self.__on_prjImportPushButton_pressed)
+
 
         self._ui.projectSelectCcomboBox.currentIndexChanged.connect(self.__on_projectSelectCcomboBox_changed)
         self._ui.prjSelectComboBox.currentIndexChanged.connect(self.__on_genTabPrjSelectCcomboBox_changed)
@@ -147,7 +158,7 @@ class MainView(QMainWindow):
 
     def get_ecu_logical_address(self):
         ecuIndex = self._ui.ecuSeclectBox.currentIndex()
-        ecuLogicAddress = get_ecu_logical_address_by_index(ecuIndex, self._ui.projectSelectCcomboBox.currentText())
+        ecuLogicAddress = self._model.get_ecu_logical_address_by_index(ecuIndex, self._ui.projectSelectCcomboBox.currentText())
         return ecuLogicAddress
 
     def get_test_can_name(self):
@@ -156,11 +167,17 @@ class MainView(QMainWindow):
 
     @Slot(int)
     def __on_projectSelectCcomboBox_changed(self, int):
-        self.__init_ecuSeclectBox()
+        if self._ui.projectSelectCcomboBox.currentText() == '':
+            pass
+        else:
+            self.__init_ecuSeclectBox()
 
     @Slot(int)
     def __on_genTabPrjSelectCcomboBox_changed(self, int):
-        self.__init_ecuNodeInfoListWidget()
+        if self._ui.projectSelectCcomboBox.currentText() == '':
+            pass
+        else:
+            self.__init_ecuNodeInfoListWidget()
 
     @Slot(str)
     def __on_testerIpAddresslineEdit_changed(self, text):
@@ -253,7 +270,7 @@ class MainView(QMainWindow):
 
         test_can_name = self.get_test_can_name()
 
-        for node in get_all_node(self._ui.projectSelectCcomboBox.currentText()):
+        for node in self._model.get_all_node(self._ui.projectSelectCcomboBox.currentText()):
             ecuAddr = node['LOGICAL_ADD']
             canName = node['CAN_NAME']
             ecuName = node['MCU_NAME']
@@ -280,12 +297,17 @@ class MainView(QMainWindow):
 
         logging.debug('ECUC FILE CHOOSE: ' + ecuc_file_choose[0])
         logging.debug('PDUR FILE CHOOSE: ' + pdur_file_choose[0])
-        doip_generate = DoIPGenerate(project)
-        ecuc_generate = EcucGenerate(project)
-        pdur_generate = PdurGenerate(project, ecuc_file_choose[0])
-        pdur_parser = PudrParser(project, pdur_file_choose[0], pdur_generate.diag_pdus)
 
-        format_can_node_list = get_format_all_ecu_node(project)
+        try :
+            doip_generate = DoIPGenerate(project, self._model)
+            ecuc_generate = EcucGenerate(project, self._model)
+            pdur_generate = PdurGenerate(project, self._model, ecuc_file_choose[0])
+            pdur_parser = PudrParser(project, self._model, pdur_file_choose[0], pdur_generate.diag_pdus)
+
+        except KeyError as e:
+            logging.debug('KeyError:{}'.format(e))
+
+        format_can_node_list = self._model.get_format_all_ecu_node(project)
         # logging.debug(format_can_node_list)
         write_to_txt(format_can_node_list, './output/ecu_info_{}.txt'.format(project))
 
@@ -316,3 +338,36 @@ class MainView(QMainWindow):
 
         allign_result = hex((allign_address+allign_size-1)&(~(allign_size-1)))
         self._ui.allignResultLineEdit.setText(allign_result)
+
+    def __on_prjImportPushButton_pressed(self):
+        project_file_choose = QFileDialog.getOpenFileName(self, "选取项目文件", os.getcwd(),
+                                                       "文本文档 (*.txt);;All Files (*)")  # 起始路径
+        project_file_choose = project_file_choose[0]
+        project = project_file_choose.split('/')[-1].split('_')[0]
+        logging.debug('Input project file: {}'.format(project))
+
+        project_node_info = []
+        with open(project_file_choose, 'r') as f:
+            while True:
+                line_str = f.readline()
+                line_str = line_str.replace('\n', '')
+                if line_str == '':
+                    break
+                else:
+                    node = line_str.split(' ')
+                    # logging.debug(node)
+                    node_dict = {}
+                    node_dict['MCU_NAME'] = node[0]
+                    node_dict['CAN_NAME'] = node[2]
+                    node_dict['LOGICAL_ADD'] = int(node[1], 16)
+                    if node[3] == 'Y':
+                        node_dict['CAN_FD'] = True
+                    else:
+                        node_dict['CAN_FD'] = False
+                    project_node_info.append(node_dict)
+
+            f.close()
+        # self._import_project_ecu_node = project_node_info
+        # print(project_node_info)
+        self._model.all_projects_info[project] = project_node_info
+        self.__init_projectSeclectBox()
