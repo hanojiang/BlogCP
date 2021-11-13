@@ -3,7 +3,7 @@ site/
 *.spec
 src/gui/build/*
 src/gui/dist/*
-.idea/
+.idea/*
 build/
 dist/
 *.so
@@ -14,6 +14,8 @@ src/DoIP_New_Arch/arxml_parse/*
 *.iml
 *.arxml
 *.xml
+BlogCP.iml
+misc.xml
 
 # tex
 
