@@ -1,0 +1,17 @@
+\section{以太网及 DoIP 配置流程}
+
+基于 Vector Davinci 软件完成基本的以太网通信及 DoIP 诊断功能，可按照以下步骤进行配置：
+
+\begin{enumerate}
+    \item 添加 \lstinline{ctcddethswc} 确保原有工程添加以太网 SWC 后可正常调度，SWC 仅保留 switch 硬件初始化的代码，其他不要添加。
+    \item 添加以太网相关模块，包括协议栈基础模块及其他关联模块。处理所有错误后，仅添加以太网 Rx Tx 中断和以太网通道 \lstinline{comm mainfunction} 映射，确保工程仍正常运行。
+    \item 检查 vlinkgen 模块是否有 EthRam var section 配置， 如果开启 cache，需要检查是否进行 cache 保护，及 SMPU flash 块的寄存器配置。
+    \item 添加以太网初始化函数（BSW）， ECUM \lstinline{memory} 初始化函数，确保工程仍正常运行。
+    \item 检查 switch 硬件相关管脚设置，包括 PWMG 模块与 \lstinline{ctcddethswc}，确保初始化管脚时序正确。
+    \item 对 switch 初始化函数进行背景任务映射，确保 switch 可以正常初始化。
+    \item 添加 eth 相关模块的 \lstinline{ mainfunction} 映射，修改 BSWM eth comm 通道控制，修改 SWC 以太网通信控制逻辑代码，验证 DoIP功能是否正常（初期需要默认使能激活线，否则无法建立 TCP 连接）。
+\end{enumerate} 
+
+接下来的各节分别针对各步骤中的关键配置进行梳理。
+
+\subsection{SWC 基本结构及配置}
