@@ -11,7 +11,7 @@
 
 \subsection{链接错误}
 \subsubsection{以太网 \lstinline{Task} 代码段未明确存放位置}\label{subsubsec:eth_ld_task_error}
-仅添加以太网 \lstinline{Task} 及 \lstinline{SWC} 后，编译链接时，报错误见图 \ref{fig:ld_error_eth_task}：
+仅添加以太网 \lstinline{Task} 及 SWC 后，编译链接时，报错误见图 \ref{fig:ld_error_eth_task}：
 
 \begin{figure}[htbp]
     \centering
@@ -20,9 +20,9 @@
     \label{fig:ld_error_eth_task}
 \end{figure}
 
-添加新的\lstinline{Task}后，需要重新生成 \lstinline{rte os vlinkgen} 等模块。\lstinline{vlinkgen} 未生成时，报上述错误。
+添加新的\lstinline{Task}后，需要重新生成 \lstinline{Rte Os vlinkGen} 等模块。\lstinline{vlinkGen} 未生成时，报上述错误。
 
-重要的新增生成内容如图 \ref{fig:add_task_generate_mode_code}：由于全局的 \lstinline{memmap} 文件内容修改，所以需要重新编译的文件比较多。
+重要的新增生成内容如图 \ref{fig:add_task_generate_mode_code}：由于全局的 \lstinline{memmap.h} 文件内容修改，所以需要重新编译的文件比较多。
 
 \begin{figure}[htbp]
     \centering
@@ -34,22 +34,22 @@
 \end{figure}
 
 \begin{definition}[解决方案]
-    当新增中断、\lstinline{Task}等内容后，需要重新生成 \lstinline{rte os vlinkgen} 等模块。
+    当新增中断、\lstinline{Task}等内容后，需要重新生成 \lstinline{Rte Os vlinkGen} 等模块。
 \end{definition}
 
-\subsubsection{添加以太网中断后 \lstinline{interrupts_flash flash} 块大小溢出}\label{subsubsec:eth_ld_interrupts_flash_overflow_error}
+\subsubsection{添加以太网中断后 \lstinline{interrupts_flash} flash 块大小溢出}\label{subsubsec:eth_ld_interrupts_flash_overflow_error}
 
-由于对齐大小的限制，在添加以太网功能后，由于新增两个中断（\lstinline{RX TX}），导致存放中断向量表和异常向量表的 \lstinline{interrupts_flash flash} 块大小超出链接文件的大小限制。
+由于对齐大小的限制，在添加以太网功能后，由于新增两个中断（\lstinline{RX TX}），导致存放中断向量表和异常向量表的 \lstinline{interrupts_flash} flash 块大小超出链接文件的大小限制。
 报图 \ref{fig:eth_ld_error_interrupts_flash_overflow} 错误。此错误在链接阶段报出。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.6]{pic/eth_ld_error_interrupts_flash_overflow.png}
-    \caption{\lstinline{interrupts_flash flash} 块大小溢出错误}
+    \caption{\lstinline{interrupts_flash} flash 块大小溢出错误}
     \label{fig:eth_ld_error_interrupts_flash_overflow}
 \end{figure}
 
-当前关于 \lstinline{interrupts_flash flash} 中存放的内容及其对齐大小如下：
+当前关于 \lstinline{interrupts_flash} flash 中存放的内容及其对齐大小如下：
 
 \begin{lstlisting}
 /* 段起始对齐大小 当前地址对齐大小 结束地址对齐大小*/
@@ -91,7 +91,7 @@ OS_EXCVEC_CORE1_CONST 256
 
 从 \lstinline{Os_Hal_Entry_Lcfg.c} 中可以看出，\lstinline{.OS_INTVEC_CODE} 段中主要存放的是 中断向量表，即个中断处理函数的入口地址。
 此外，本应放置在 \lstinline{.OS_CODE} 段的中断处理函数入口代码，也放到了\lstinline{.OS_INTVEC_CODE} 段中。导致\lstinline{.OS_INTVEC_CODE} 段占用太大。
-后续再分配 \lstinline{.OS_EXCVEC_CORE0_CODE} 段和 \lstinline{.OS_EXCVEC_CORE1_CODE} 段后，\lstinline{interrupts_flash flash} 块已没有过多的空间。
+后续再分配 \lstinline{.OS_EXCVEC_CORE0_CODE} 段和 \lstinline{.OS_EXCVEC_CORE1_CODE} 段后，\lstinline{interrupts_flash} flash 块已没有过多的空间。
 添加以太网功能后，新增的两个中断符号及中断处理函数代码会继续扩大 \lstinline{.OS_INTVEC_CODE} 段的使用空间，在当前工程中，刚好超过预定义的块大小 12kB。
 
 \begin{definition}[解决方案]
@@ -102,13 +102,13 @@ OS_EXCVEC_CORE1_CONST 256
 \end{definition}
 
 \subsection{cache 相关}
-\subsubsection{开启 \lstinline{cache} 后，Switch 未能正常初始化 （AS33）}\label{subsubsec:desc_buffer_cache}
+\subsubsection{开启 cache 后，Switch 未能正常初始化 （AS33）}\label{subsubsec:desc_buffer_cache}
 
-开启  \lstinline{cache} 后，Switch 未能正常初始化，但程序其他功能正常运行，\lstinline{Task} 正常调度。
+开启  cache 后，Switch 未能正常初始化，但程序其他功能正常运行，\lstinline{Task} 正常调度。
 由于初期添加以太网功能时，仅将 Switch 初始化函数放置于背景任务中，其他所有的 \lstinline{MainFunction} 均未放置到 \lstinline{Task} 调度。
 所以 Swtich 不能正常初始化仅和 Switch 模块及 ETH 以太网 ENET 外设驱动模块有关。
 
-该版本开启了 \lstinline{Data Cache}，查阅 ETH 驱动模块文档，关于以太网描述符及内部使用缓存变量受 cache 的影响说明如图 \ref{fig:desc_buffer_cache}：
+该版本开启了 Data Cache，查阅 ETH 驱动模块文档，关于以太网描述符及内部使用缓存变量受 cache 的影响说明如图 \ref{fig:desc_buffer_cache}：
 
 \begin{figure}[htbp]
     \centering
@@ -119,8 +119,8 @@ OS_EXCVEC_CORE1_CONST 256
 \end{figure}
 
 因此，开启 cache 后，需要将以太网缓存及描述符变量通过 MPU 进行保护。
-当前工程中，已定义 \lstinline{NONE_CACHE_DATA_RAM Block} 作为不被 cache 变量存放的区域，所以需要将以太网缓存及描述符相关变量存储的段
-\lstinline{.EthRam} 放置于 \lstinline{NONE_CACHE_DATA_RAM Block}中。并在 MPU 寄存器中进行首尾 ram 地址配置。代码如下所示：
+当前工程中，已定义 \lstinline{NONE_CACHE_DATA_RAM} Block 作为不被 cache 变量存放的区域，所以需要将以太网缓存及描述符相关变量存储的段
+\lstinline{.EthRam} 放置于 \lstinline{NONE_CACHE_DATA_RAM} Block中。并在 MPU 寄存器中进行首尾 ram 地址配置。代码如下所示：
 
 
 \begin{lstlisting}[language=C,style=C]
@@ -215,18 +215,18 @@ void Smpu_config(void)
 \end{lstlisting}
 
 \begin{definition}[解决方案]
-    将 \lstinline{.EthRam} 放置于 \lstinline{NONE_CACHE_DATA_RAM Block}中。并在 MPU 寄存器中对 \lstinline{NONE_CACHE_DATA_RAM Block} 进行首尾 ram 地址配置。
+    将 \lstinline{.EthRam} 放置于 \lstinline{NONE_CACHE_DATA_RAM} Block中。并在 MPU 寄存器中对 \lstinline{NONE_CACHE_DATA_RAM} Block 进行首尾 ram 地址配置。
 \end{definition}
 
-\subsubsection{开启 \lstinline{cache} 及 EthRam cache smpu 保护后，程序异常 （AS33）}\label{subsubsec:smpu_address_overlap}
+\subsubsection{开启 cache 及 EthRam cache smpu 保护后，程序异常 （AS33）}\label{subsubsec:smpu_address_overlap}
 
-该问题与前述第 \ref{subsubsec:desc_buffer_cache}节问题强相关，在开启 \lstinline{cache} 后，需要对以太网缓存及描述符变量进行 MPU 保护。由于以太网相关变量占用 Ram空间较大，原来分配的非 \lstinline{cache} 块不足再分配给以太网使用，
-所以需要扩大该块的大小。需要在 \lstinline{vlinkgen} 模块中进行大小修改，并将 \lstinline{.EthRam} 放置于扩容后的 \lstinline{NONE_CACHE_DATA_RAM Block}中。
-由于 \lstinline{NONE_CACHE_DATA_RAM Block} 扩容的空间来自于 \lstinline{SYSTEM_RAM Block}。因此，需要同步缩小 \lstinline{SYSTEM_RAM Block}大小。
-同理，在 MPU 寄存器配置中，需要对可被 \lstinline{cache} 的\lstinline{SYSTEM_RAM Block}块和不被 \lstinline{cache}的 \lstinline{NONE_CACHE_DATA_RAM Block}的起始地址和末尾地址都要通过修改，\textbf{确保无重叠}。
+该问题与前述第 \ref{subsubsec:desc_buffer_cache}节问题强相关，在开启 cache 后，需要对以太网缓存及描述符变量进行 MPU 保护。由于以太网相关变量占用 Ram空间较大，原来分配的非 cache 块不足再分配给以太网使用，
+所以需要扩大该块的大小。需要在 \lstinline{vlinkGen} 模块中进行大小修改，并将 \lstinline{.EthRam} 放置于扩容后的 \lstinline{NONE_CACHE_DATA_RAM} Block中。
+由于 \lstinline{NONE_CACHE_DATA_RAM} Block 扩容的空间来自于 \lstinline{SYSTEM_RAM} Block。因此，需要同步缩小 \lstinline{SYSTEM_RAM} Block大小。
+同理，在 MPU 寄存器配置中，需要对可被 cache 的\lstinline{SYSTEM_RAM} Block块和不被 cache的 \lstinline{NONE_CACHE_DATA_RAM} Block的起始地址和末尾地址都要通过修改，\textbf{确保无重叠}。
 
 \begin{definition}[解决方案]
-    确保可被 \lstinline{cache} 的块和不被 \lstinline{cache}的块的起始地址和末尾地址\textbf{确保无重叠}。
+    确保可被 cache 的块和不被 cache的块的起始地址和末尾地址\textbf{确保无重叠}。
 \end{definition}
 
 \subsection{Swtich 初始化}
@@ -235,7 +235,7 @@ void Smpu_config(void)
 
 问题现象：
 \begin{enumerate}
-    \item switch 初始化不成功，相关硬件初始化 Flag 不置位；
+    \item Switch 初始化不成功，相关硬件初始化 Flag 不置位；
     \item 调试 \lstinline{EthSwt_30_88Q5050_VSwitchInit}，发现可以成功下载寄存器配置，但无法完成各端口初始化 \lstinline{EthSwt_30_88Q5050_InitPorts}
     \item 在 100Base-T1 端口初始化中（\lstinline{EthTrcv_30_88Q1010_Internal_TransceiverInit}），\lstinline{EthTrcv_30_88Q1010_LL_IsTransceiverAccessOk}无法成功返回。最终导致初始化不成功。
 \end{enumerate}

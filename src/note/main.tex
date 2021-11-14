@@ -1,4 +1,6 @@
 \documentclass[cn,10pt,math=newtx,color=blue]{elegantbook}
+\usepackage{fontspec}
+\setmonofont{Consolas}
 % \input{package/package_setup}
 \usepackage{listings}
 % 用来设置附录中代码的样式
@@ -16,8 +18,14 @@
 %     frame               =   lrtb,   % 显示边框
 % }
 
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
 \lstset{
-    basicstyle=\tt,
+    basicstyle=\ttfamily,
+    backgroundcolor=\color{backgroundColour},
     keywordstyle=\color{purple}\bfseries,
     % identifierstyle=\color{brown!80!black},
     commentstyle=\color{gray}
@@ -37,10 +45,7 @@
     basewidth       =   0.5em,
 }
 
-\definecolor{mGreen}{rgb}{0,0.6,0}
-\definecolor{mGray}{rgb}{0.5,0.5,0.5}
-\definecolor{mPurple}{rgb}{0.58,0,0.82}
-\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
 
 \lstdefinelanguage{CAPL}
 {

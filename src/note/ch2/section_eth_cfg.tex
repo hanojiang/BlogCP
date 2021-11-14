@@ -22,9 +22,9 @@
 
 \begin{enumerate}
     \item Port: 软件或硬件接入设备的入口，所以也分为物理端口和虚拟端口。CANoe 中仿真节点接入的就是虚拟端口。一个端口只能被一个 segment 包含。
-    \item Segment: 分片是端口的组合。 必须至少创建一个分片并连接到一个物理端口。 每个分片都有一个唯一的名称，并且恰好分配给一个网络。 有两种类型的段可用：switch 和 link。 
+    \item Segment: 分片是端口的组合。 必须至少创建一个分片并连接到一个物理端口。 每个分片都有一个唯一的名称，并且恰好分配给一个网络。 有两种类型的段可用：Switch 和 link。 
     \begin{enumerate}
-        \item switch segment: 提供 2 层交换机的功能。
+        \item Switch segment: 提供 2 层交换机的功能。
         \item link segment: 完全透明地连接两个端口。 用于透明地转发以太网数据包和物理层的状态。Link segment 存在两种连接方式：TAP 和 直连。TAP 模式下，两个物理端口间有很小的延迟（$\leq 6 \mu s$）。类似之前固件中提供的 MAC 旁路功能。
         直连模式适用于一个物理端口和虚拟端口间的连接。
     \end{enumerate}
@@ -41,8 +41,8 @@
     \caption{拓扑实例}
     \label{fig:example_topology}
 \end{figure}
-图\ref{fig:example_topology} 包含两个复杂网络节点 \textbf{N3} 和 \textbf{N4}，各自集成了一个 switch。
-另外每个 switch 上连接了一个仿真节点 \textbf{N1} 和  \textbf{N6}。两个真实节点  \textbf{N2} 和  \textbf{N5}。
+图\ref{fig:example_topology} 包含两个复杂网络节点 \textbf{N3} 和 \textbf{N4}，各自集成了一个 Switch。
+另外每个 Switch 上连接了一个仿真节点 \textbf{N1} 和  \textbf{N6}。两个真实节点  \textbf{N2} 和  \textbf{N5}。
 
 下图 \ref{fig:two_setup} 展示了固件版本 11.1 前后的实现方法。
 
@@ -53,8 +53,8 @@
     \label{fig:two_setup}
 \end{figure}
 
-之前版本中，一个设备仅能配置一个 switch 分片，因此，需要两个设备通过两个通道接入 CANoe。所以，在 CANoe 中需要配置两个 network。
-之后版本中，允许自由配置分片。因此，可以配置两个 switch 分片，两个分片都分配在一个 network 中。因此，在 CANoe 中，仅需要配置一个 network。
+之前版本中，一个设备仅能配置一个 Switch 分片，因此，需要两个设备通过两个通道接入 CANoe。所以，在 CANoe 中需要配置两个 network。
+之后版本中，允许自由配置分片。因此，可以配置两个 Switch 分片，两个分片都分配在一个 network 中。因此，在 CANoe 中，仅需要配置一个 network。
 
 \subsubsection{以太网包的收发方向}
 设备接口接收到的以太网数据包总是标有 Rx 方向。 在这种情况下，数据包是由应用程序（例如 CANoe 模拟节点）生成还是来自真实网络无关紧要。
@@ -76,7 +76,7 @@
 
 下图\ref{fig:three_connect_ways}展示了三种连接方式，分别为：
 \begin{itemize}
-    \item 真实节点和仿真节点通过 switch 连接
+    \item 真实节点和仿真节点通过 Switch 连接
     \item 真实节点和仿真节点直连
     \item 两个真实节点旁路连接，CANoe 作为检测
 \end{itemize}
