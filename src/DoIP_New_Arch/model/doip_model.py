@@ -3,6 +3,7 @@ from PySide2.QtWidgets import QApplication
 from uds import Uds
 from ctypes import *
 import os
+import json
 
 class Model(QObject):
     sig_testerIpAddresslineEdit_changed = Signal(str)
@@ -17,6 +18,7 @@ class Model(QObject):
         self._ecu_logical_address = 0x1000
         self._tester_ip_address = '172.31.7.88'
         self._tester_logical_address = 0x0e80
+        self.load_project_from_json('./xml_generate/project.json')
 
     @property
     def ecu_ip_address(self):
@@ -148,6 +150,81 @@ class Model(QObject):
         diagRespData = [x.zfill(2) for x in diagRespData]
 
         return ' '.join(diagRespData)
+
+    def load_project_from_json(self, fileName):
+        with open(fileName, 'r', encoding='utf-8') as f:
+            self.all_projects_info = json.load(f)
+
+        # self.all_projects_name = list(self.all_projects_info.keys())
+        # print(self.all_projects_name)
+        for project_name, project_info in self.all_projects_info.items():
+            for node in project_info:
+                node['LOGICAL_ADD'] = int(node['LOGICAL_ADD'], 16)
+                node['CAN_FD'] = bool(node['CAN_FD'])
+
+    def get_all_node(self, project):
+
+        # project_key = "GW04_ALL_NODE_{}".format(project)
+        GW04_ALL_NODE = self.all_projects_info[project]
+
+        return GW04_ALL_NODE
+
+    def get_all_ecu(self, project):
+
+        allNode = []
+
+        for node in self.get_all_node(project):
+            allNode.append('{:>6}({})'.format(node['MCU_NAME'], hex(node['LOGICAL_ADD'])))
+
+        return allNode
+
+    def get_all_can(self):
+
+        # allCan = ['CF', 'CN', 'PT', 'CH', 'AD', 'PTEXT']
+        allCan = ['BDCAN', 'INFOCAN', 'PTCANFD', 'CHCAN2', 'CHCANFD', 'PTEXTCAN', 'ADCANFD']
+
+        return allCan
+
+    def get_all_project(self):
+        allProject = list(self.all_projects_info.keys())
+
+        return allProject
+
+    def get_format_all_ecu_node(self, project):
+        all_node = self.get_all_node(project)
+        format_node_list = []
+        format_node_list_info_can = []
+        format_node_list_info_fd = []
+        format_node_list_case_can = []
+        format_node_list_case_fd = []
+        for node in all_node:
+            if node['MCU_NAME'] == 'GW':
+                continue
+            if node['CAN_FD'] == True:
+                format_node_list_info_fd.append(
+                    '{} = {},//{}CANFD'.format(node['MCU_NAME'], hex(node['LOGICAL_ADD']), node['CAN_NAME']))
+            else:
+                format_node_list_info_can.append(
+                    '{} = {},//{}CAN'.format(node['MCU_NAME'], hex(node['LOGICAL_ADD']), node['CAN_NAME']))
+
+        for node in all_node:
+            if node['MCU_NAME'] == 'GW':
+                continue
+            if node['CAN_FD'] == True:
+                format_node_list_case_fd.append('case {}://{}CANFD'.format(node['MCU_NAME'], node['CAN_NAME']))
+            else:
+                format_node_list_case_can.append('case {}://{}CAN'.format(node['MCU_NAME'], node['CAN_NAME']))
+
+        format_node_list.extend(format_node_list_info_can)
+        format_node_list.extend(format_node_list_info_fd)
+        format_node_list.extend(format_node_list_case_can)
+        format_node_list.extend(format_node_list_case_fd)
+        return format_node_list
+
+    def get_ecu_logical_address_by_index(self, index, project):
+        GW04_ALL_NODE = self.get_all_node(project)
+
+        return GW04_ALL_NODE[index]['LOGICAL_ADD']
 
 def keyGen(seed_input):
     print(os.getcwd())

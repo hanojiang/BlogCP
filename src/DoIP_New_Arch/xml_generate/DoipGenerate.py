@@ -2,18 +2,20 @@ from xml_generate.ArxmlBase import ArxmlBase
 import logging
 from xml_generate.DoipJsonFormat import *
 import copy
-from Ecu_Const import GW04_ALL_NODE_AS32, GW04_ALL_NODE_AS33, GW04_ALL_NODE_AS33P, get_all_node
+# from Ecu_Const import GW04_ALL_NODE_AS32, GW04_ALL_NODE_AS33, GW04_ALL_NODE_AS33P, get_all_node
 import os
 
 class GenerateBase:
 
-    def __init__(self, module, project):
+    def __init__(self, module, project, doip_model):
         self._project = project
+        self.doip_model = doip_model
         self._template_file = 'GW04_{}_template.xml'.format(module)
         self._generate_xml_file = 'GW04_{}_ecuc_{}.arxml'.format(module, project)
         # print(os.getcwd())
         self._arxml_parse = ArxmlBase('./xml_generate/' + self._template_file)
         self.get_ecu_node(project)
+
         # logging.debug(self.ecu_node)
 
     def get_ecu_node(self, project):
@@ -25,7 +27,7 @@ class GenerateBase:
         # elif project == 'AS33P':
         #     self.ecu_node = GW04_ALL_NODE_AS33P
 
-        self.ecu_node = get_all_node(project)
+        self.ecu_node = self.doip_model.get_all_node(project)
     def generate_arxml(self):
         self._arxml_parse.xml_write_to_file('./output/' + self._generate_xml_file)
 
@@ -33,8 +35,8 @@ class DoIPGenerate(GenerateBase):
 
     # DOIP_TEMPLATE_FILE = 'GW04_DoIP_template.xml'
 
-    def __init__(self, project):
-        super(DoIPGenerate, self).__init__('DoIP', project)
+    def __init__(self, project, doip_model):
+        super(DoIPGenerate, self).__init__('DoIP', project, doip_model)
         # self._generate_xml_file = 'GW04_DoIP_ecuc_{}.arxml'.format(project)
         # self._arxml_parse = ArxmlBase(self.TEMPLATE_FILE)
         # logging.debug(self.ecu_node)
@@ -127,8 +129,8 @@ class DoIPGenerate(GenerateBase):
 class EcucGenerate(GenerateBase):
 
 
-    def __init__(self, project):
-        super().__init__('EcuC', project)
+    def __init__(self, project, doip_model):
+        super().__init__('EcuC', project, doip_model)
         # self._generate_xml_file = 'GW04_EcuC_{}.arxml'.format(project)
         self.get_Pdus()
         self.get_ecuc_container()
@@ -177,7 +179,7 @@ class EcucGenerate(GenerateBase):
     def append_pdus(self):
         logging.debug('**********************ECUC PDU GENERATE START**********************')
         logging.debug('ECUC: Add global pdu number is {}'.format(len(self._pdus)))
-        for pdu_name in self._pdus[1:]:
+        for pdu_name in self._pdus:
             new_pdu_container = copy.deepcopy(self._ecu_container)
             # new_pdu_container_short_name = new_pdu_container.xpath('./test_ns:SHORT-NAME', namespaces=ns)
             new_pdu_container_short_name = self._arxml_parse.get_first_child_by_xpath(new_pdu_container,
@@ -185,12 +187,14 @@ class EcucGenerate(GenerateBase):
             new_pdu_container_short_name.text = pdu_name
             logging.debug('ECUC: Add global pdu {}'.format(pdu_name))
             self._subcontainer.append(new_pdu_container)
-
+        # logging.debug('ecu subcontainer len is {}'.format(len(self._subcontainer)))
+        self._subcontainer.__delitem__(0)
+        # logging.debug('ecu subcontainer len is {}'.format(len(self._subcontainer)))
         logging.debug('**********************ECUC PDU GENERATE END**********************')
 class PdurGenerate(GenerateBase):
 
-    def __init__(self, project, ecuc_arxml_file_name):
-        super(PdurGenerate, self).__init__('PduR', project)
+    def __init__(self, project, doip_model, ecuc_arxml_file_name):
+        super(PdurGenerate, self).__init__('PduR', project, doip_model)
         self.diag_pdus = {}
         # self.get_DoIPConfigSet_subcontainer()
         # self.get_DoIPConnections_subcontainer()
@@ -232,11 +236,13 @@ class PdurGenerate(GenerateBase):
             et_text = et.text
             if 'DCM_DIAG' in et_text:
                 et_text_split = et_text.split('_')
-                if len(et_text_split) == 6:
+                if len(et_text_split) >= 6:
                     if et_text_split[3] == 'CCP':
                         key_str = 'GW' + '_' + et_text_split[2] + '_' + et_text_split[5]
-                    else:
+                    elif len(et_text_split) == 6:
                         key_str = et_text_split[3] + '_' + et_text_split[2] + '_' + et_text_split[5]
+                    else:
+                        key_str = et_text_split[3] + '_' + et_text_split[4] + '_'  + et_text_split[2] + '_' + et_text_split[6]
                     diag_can_pdus[key_str] = et_text
                     logging.debug(key_str + '****' + diag_can_pdus[key_str])
 
@@ -245,8 +251,9 @@ class PdurGenerate(GenerateBase):
 
 class PudrParser(ArxmlBase):
 
-    def __init__(self, project, fileName, diag_can_pdu):
+    def __init__(self, project,  doip_model, fileName, diag_can_pdu):
         super().__init__(fileName)
+        self.doip_model = doip_model
         self._diag_can_pdu = diag_can_pdu
         self.get_ecu_node(project)
         self.generate_all_can_node_response()
@@ -301,7 +308,7 @@ class PudrParser(ArxmlBase):
         #     self.ecu_node = GW04_ALL_NODE_AS32
         # elif project == 'AS33':
         #     self.ecu_node = GW04_ALL_NODE_AS33
-        self.ecu_node = get_all_node(project)
+        self.ecu_node = self.doip_model.get_all_node(project)
     def generate_all_can_node_response(self):
         for ecu_node in self.ecu_node:
             if ecu_node['MCU_NAME'] == 'GW':

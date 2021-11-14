@@ -1,10 +1,135 @@
 汽车电子架构变得越发复杂，包括越来越多的传感器、控制器和接口，对通信带宽、链路和速率有了更高的要求。
 以太网通信相较于传统的车载通信方式，如 CAN、LIN 等，具有高通信速率的显著优势。
+
+
+车载以太网协议是一组多个不同层次上的协议簇。从上到下一共分为5层，分别是应用层、传输层、网络层、数据链路层、物理层。5层结构对应于 简化的OSI参考模型，并且提供了各种协议框架下形成的协议簇。
+区别于传统以太网，AutoSar对车载以太网的协议架构划分如下：
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.6]{pic/eth_layer.pdf}
+    \caption{AutoSar 车载以太网协议架构}
+    \label{fig:autosar_eth_layer}
+\end{figure}
+
 本章将基于 AutoSar 软件架构及 Vector 工具链完成相关模块的配置，以实现基本的以太网通信。
 
-\section{物理层}
+\section{物理层与链路层}
 
-\section{链路层}
+\subsection{MAC与PHY}
+
+物理层中对以太网硬件的接口形式和编码协议进行了定义。从硬件的角度看，如下图所示，以太网接口电路主要由MAC（Media Access Control）控制器和物理层接口PHY（Physical Layer，PHY）两大部分构成。MAC位于是数据链路层，PHY是物理层;两者通过SMI接口和MII接口连接。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/mii_interface.jpg}
+    \caption{MII 接口}
+    \label{fig:mii_interface}
+\end{figure}
+
+\subsection{SMI 和 MII}
+SMI为串行管理接口，以太网MAC通过该接口可以访问PHY的寄存器，通过对这些寄存器操作可对PHY进行控制和管理。SMI接口包括MDIO（控制和管理PHY，以获取PHY的状态）和MDC（为MDIO提供时钟）。MDC由MAC提供，MDIO是一根双向的数据线，用来传送MAC层的控制信息和物理层的状态信息。
+
+MII（Media Independent Interface）即媒体独立接口，MII接口是MAC与PHY连接的标准接口，以太网MAC通过该接口发出数据帧经过PHY后传输到其他网络节点上，同时其他网络节点的数据先经过PHY后再由MAC接收。	
+
+MII接口衍生了很多其他版本，如RMII、GMII、SGMII、RGMII等。这里简要介绍其中的MII和RMII，如下图所示。MII共使用了16根线。其中CRS与COL只在半双工模式有效，而车载以太网固定工作在全双工模式下，故应用在车载以太网需要14根线。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/mii_interface_2.jpg}
+    \caption{MII 接口}
+    \label{fig:mii_interface2}
+\end{figure}
+
+RMII是精简版的MII，数据发送接收均为两根，相比MII减少了4根，另外它整合或减去了一些线，最终RMII只有8根线RMII的接口如下：
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/rmii_interface.jpg}
+    \caption{MII 接口}
+    \label{fig:rmii_interface}
+\end{figure}
+
+\subsection{以太网线束}
+对于以太网连接线束，车载以太网与消费用以太网是不同的，首先消费用以太网的标准主要采用10/100BASE-TX和1000BASE-T，其中1000BASE-T是使用RJ45接口，需要四对双绞线共8根线进行数据传输，而10/100BASE-TX则是只使用四对双绞线其中的两对共4根线进行数据传输。
+
+而车载以太网一般都采用带T1的标准，如IEEE 100BASE-T1、IEEE 1000BASE-T1，这些都使用一对双绞线共两根线进行数据传输：
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/100basetT1_Tx.png}
+    \caption{100BASE-TX 与 1000BASE-T1}
+    \label{fig:100basetT1_Tx}
+\end{figure}
+
+\subsection{协议转换器}
+为了实现100BASE-T1和100BASE-TX协议转换，开发和测试过程中通过协议转换器进行转换，便于在PC上直连测试。如RADMOON转换器。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/protocal_convert.png}
+    \caption{协议转换器}
+    \label{fig:protocal_convert}
+\end{figure}
+
+\subsection{交换机}
+以太网交换机为车载网络中多个ECU的数据交互提供了桥梁。如下图所示，MCU通过SMI接口控制和管理switch,通过MII接口和switch进行数据交互。
+
+Switch内集成多个PHY，实现多路外部设备的接入。通过多个switch的级联，可以增大节点的接入数量。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/connect_bt_mcu_switch.png}
+    \caption{交换机与MCU连接示意}
+    \label{fig:connect_bt_mcu_switch}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/switch_cap.png}
+    \caption{Switch级联}
+    \label{fig:switch_cap}
+\end{figure}
+
+Switch 主要支持以下功能：
+\begin{itemize}
+    \item 端口设备MAC地址的自学习，ARL表管理。
+    \item 端口VLAN管理
+    \item 端口镜像功能
+    \item 端口状态信息及故障信息处理 
+\end{itemize}
+
+\subsection{以太网帧}
+对于上层交付的PDU，通过添加帧头和帧尾使之成为帧，最终在数据链路上传输。这样封装好的帧称为以太网帧，以太帧有多种类型，不同类型的帧具有不同的格式和MTU值，但在同种物理媒体上都可同时存在。目前常用的为Ethernet II帧格式。如下图所示：
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.6]{pic/eth_mac_format.jpg}
+    \caption{Ethernet II帧格式}
+    \label{fig:Ethernet_ii_frame}
+\end{figure}
+
+其中关键字段说明如下：
+\begin{itemize}
+    \item 前导码，7字节，通知目标主机准备接受数据。
+    \item 帧首定界符，1字节，表示一帧的开始。
+    \item MAC地址：6字节*2，项目中由网络工程师根据项目需求给各个控制器分配私有MAC地址(包括车内单播和组播地址)。
+    \item Vlan标签，4字节。
+    \item 帧类型：常用以太网帧类型如0x0800(IPv4), 0x0806(ARP),0x8100(VLAN Tag)
+    \item 帧校验序列，4字节CRC校验值
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{pic/Ethernet_frame_type.jpg}
+    \caption{常用以太网帧类型}
+    \label{fig:Ethernet_frame_type}
+\end{figure}
+
+\subsection{VLAN}
+VLAN主要目的是将一个LAN在逻辑上划分成多个广播域。相同VLAN内的控制器间可以直接通信，而不同VLAN间不能直接通信，从而将广播报文限制在一个VLAN内。当设备数目较多时可以有效隔离广播报文和提升网络质量。
+
+车内网络中为不同节点或诊断设备分配了一个或多个VLAN ID。对于网关节点，为实现车内网络中各以太网节点间的通信需要两步，一是网关自身具有对需求要求的VLAN标签的以太网报文进行处理的能力；二是，配置switch各个端口的VLAN处理功能，实现各节点间基于VLAN的通信。
 
 \subsection{链路聚合}
 链路聚合\cite{Link_Aggregation}（英语：Link Aggregation）是一个计算机网络术语，指将多个物理端口汇聚在一起，形成一个逻辑端口，
@@ -115,4 +240,3 @@ ISR( EthIsr_EthernetCnt_MCU_Ctrl_ad7672f0_EthInterruptServiceRoutine_Q0Tx );
 
 后续通过 \lstinline{Eth_30_Enet_Internal_Receive} 处理接收到的数据帧，其中由 \lstinline{Eth_30_Enet_Receive_ProcessValidFrame} 验证数据帧后，由 \lstinline{EthIf_RxIndication} 传至上层模块。
 
-\input{ch2/section_ip.tex}

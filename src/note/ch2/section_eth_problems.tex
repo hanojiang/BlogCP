@@ -4,9 +4,9 @@
     \item \nameref{subsubsec:eth_ld_task_error}
     \item \nameref{subsubsec:eth_ld_interrupts_flash_overflow_error}
     \item \nameref{subsubsec:desc_buffer_cache}
-    \item 开启 \lstinline{cache} 及 EthRam cache smpu 保护后，程序异常 （AS33）
+    \item \nameref{subsubsec:smpu_address_overlap}
     \item 修改中断向量及异常向量对齐大小后程序异常 （AS33）
-    \item Switch 未能正常初始化，下载配置后，端口初始化失败（AS33P）
+    \item \nameref{subsubsec:switch_init_error1}
 \end{introduction}
 
 \subsection{链接错误}
@@ -218,7 +218,7 @@ void Smpu_config(void)
     将 \lstinline{.EthRam} 放置于 \lstinline{NONE_CACHE_DATA_RAM Block}中。并在 MPU 寄存器中对 \lstinline{NONE_CACHE_DATA_RAM Block} 进行首尾 ram 地址配置。
 \end{definition}
 
-\subsubsection{开启 \lstinline{cache} 及 EthRam cache smpu 保护后，程序异常 （AS33）}
+\subsubsection{开启 \lstinline{cache} 及 EthRam cache smpu 保护后，程序异常 （AS33）}\label{subsubsec:smpu_address_overlap}
 
 该问题与前述第 \ref{subsubsec:desc_buffer_cache}节问题强相关，在开启 \lstinline{cache} 后，需要对以太网缓存及描述符变量进行 MPU 保护。由于以太网相关变量占用 Ram空间较大，原来分配的非 \lstinline{cache} 块不足再分配给以太网使用，
 所以需要扩大该块的大小。需要在 \lstinline{vlinkgen} 模块中进行大小修改，并将 \lstinline{.EthRam} 放置于扩容后的 \lstinline{NONE_CACHE_DATA_RAM Block}中。
@@ -227,4 +227,23 @@ void Smpu_config(void)
 
 \begin{definition}[解决方案]
     确保可被 \lstinline{cache} 的块和不被 \lstinline{cache}的块的起始地址和末尾地址\textbf{确保无重叠}。
+\end{definition}
+
+\subsection{Swtich 初始化}
+
+\subsubsection{Switch 未能正常初始化，下载配置后，端口初始化失败（AS33P）}\label{subsubsec:switch_init_error1}
+
+问题现象：
+\begin{enumerate}
+    \item switch 初始化不成功，相关硬件初始化 Flag 不置位；
+    \item 调试 \lstinline{EthSwt_30_88Q5050_VSwitchInit}，发现可以成功下载寄存器配置，但无法完成各端口初始化 \lstinline{EthSwt_30_88Q5050_InitPorts}
+    \item 在 100Base-T1 端口初始化中（\lstinline{EthTrcv_30_88Q1010_Internal_TransceiverInit}），\lstinline{EthTrcv_30_88Q1010_LL_IsTransceiverAccessOk}无法成功返回。最终导致初始化不成功。
+\end{enumerate}
+
+问题原因：
+在 \lstinline{CtApPwmgSWC.c} 模块中，会根据 CAN 网络状态，周期性的处理 MCU IO 管脚的状态。具体实现在 \lstinline{pwmg_PowrOnIO()}函数中。
+当前实现中，周期性将 \lstinline{INDEX_IOM_PIN_POWER_ETH_EN} 拉低，导致 Switch 供电关闭，所以硬件不可访问。
+
+\begin{definition}[解决方案]
+    \lstinline{pwmg_PowrOnIO()}函数中 \lstinline{INDEX_IOM_PIN_POWER_ETH_EN} 改为拉高。
 \end{definition}

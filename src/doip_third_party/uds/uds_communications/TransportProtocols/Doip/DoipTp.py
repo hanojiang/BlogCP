@@ -104,4 +104,6 @@ class DoipTp(iTp):
     def DoIPClient(self):
         return self.__connection
 
+    def setEcuLogicalAddress(self, ecuAddr):
+        self.__connection.ecu_logical_address = ecuAddr
 

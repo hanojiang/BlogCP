@@ -434,6 +434,13 @@
            <widget class="QComboBox" name="prjSelectComboBox"/>
           </item>
           <item>
+           <widget class="QPushButton" name="prjImportPushButton">
+            <property name="text">
+             <string>导入项目</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="generateCfgPushButton">
             <property name="text">
              <string>生成配置</string>
