@@ -263,6 +263,12 @@
         "CAN_FD" : "True"
     },
     {
+        "CAN_NAME" : "CH",
+        "MCU_NAME" : "LADS",
+        "LOGICAL_ADD" : "0x736",
+        "CAN_FD" : "True"
+    },
+    {
         "CAN_NAME" : "AD",
         "MCU_NAME" : "FDR",
         "LOGICAL_ADD" : "0x734",

@@ -1,0 +1,36 @@
+\section{前导零与后导零计算}
+
+前导零：即一个数的二进制，从 MSB 开始数，直到遇到第一个1，前面几有个零。如 \lstinline{0x00FFFFFF} 前导零为8； \lstinline{0xF0000000} 前导零为0； \lstinline{0x08010002} 前导零为4。
+
+后导零则与之相反，从 LSB 开始计算。两种情况下，具体的代码实现见后两节。
+
+\subsection{前导零}
+
+此代码从 UCOS 实现源码中截取，详见博客\cite{65TiaoXiaoXiJiSuanQianDaoLingCYuYanShiXianU013073067DeBoKeCSDNBoKe}。
+\lstinputlisting[
+    style       =   C,
+    language = C,
+    caption     =   {前导零计算},
+]{ch7/lead_zero.c}
+
+\subsection{后导零}
+
+\lstinputlisting[
+    style       =   C,
+    language = C,
+    caption     =   {后导零计算},
+]{ch7/back_zero.c}
+
+\section{二进制数位翻转}
+
+\begin{lstlisting}[language=C,style=C]
+uint16 eth_bitReverse(uint16 value)
+{
+    value = (((value & 0xaaaa) >> 1) | ((value & 0x5555) << 1));
+    value = (((value & 0xcccc) >> 2) | ((value & 0x3333) << 2));
+    value = (((value & 0xf0f0) >> 4) | ((value & 0x0f0f) << 4));
+    value = (((value & 0xff00) >> 8) | ((value & 0x00ff) << 8));
+
+    return(value);
+}
+\end{lstlisting}

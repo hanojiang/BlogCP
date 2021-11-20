@@ -180,8 +180,8 @@ class Model(QObject):
 
     def get_all_can(self):
 
-        # allCan = ['CF', 'CN', 'PT', 'CH', 'AD', 'PTEXT']
-        allCan = ['BDCAN', 'INFOCAN', 'PTCANFD', 'CHCAN2', 'CHCANFD', 'PTEXTCAN', 'ADCANFD']
+        allCan = ['CF', 'CN', 'PT', 'CH', 'AD', 'PTEXT']
+        # allCan = ['BDCAN', 'INFOCAN', 'PTCANFD', 'CHCAN2', 'CHCANFD', 'PTEXTCAN', 'ADCANFD']
 
         return allCan
 
