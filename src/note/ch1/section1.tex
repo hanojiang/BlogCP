@@ -2,19 +2,23 @@
 
 \subsection{数据类型定义}
 
+\subsubsection{\lstinline{Port_aPinConfigDefault}}
+
+已使用管脚的初始配置如下：
+
 \begin{lstlisting}[language=C,style=C]
     typedef struct
     {
-        VAR(Port_InternalPinIdType, PORT_VAR) u16SIUPin; /**< @brief Pin Defined on Part SIUx */
-        VAR(uint32,                 PORT_VAR) u32MSCR;   /**< @brief Pad Control Register */
+        VAR(Port_InternalPinIdType, PORT_VAR) u16SIUPin; /**< 使用PIN pcr number @brief Pin Defined on Part SIUx */
+        VAR(uint32,                 PORT_VAR) u32MSCR;   /**< 寄存器 MSCR 初值    @brief Pad Control Register */
     #if defined(IPV_SIUL2_ODC_SUPPORT_U8)
-        VAR(uint32,                 PORT_VAR) u32ODC;    /**< @brief Pad Output Driver Control Configuration */
+        VAR(uint32,                 PORT_VAR) u32ODC;    /**<  not used          @brief Pad Output Driver Control Configuration */
     #endif /* defined(IPV_SIUL2_ODC_SUPPORT_U8) */
-        VAR(uint8,                  PORT_VAR) u8PDO;     /**< @brief Pad Data Output */
-        VAR(uint8,                  PORT_VAR) u8PDDir;   /**< @brief Pad Data Direction */
-        VAR(boolean,                PORT_VAR) bGPIO;     /**< @brief GPIO initial mode*/
-        VAR(boolean,                PORT_VAR) bDC;       /**< @brief Direction changebility*/
-        VAR(boolean,                PORT_VAR) bMC;       /**< @brief Mode changebility*/
+        VAR(uint8,                  PORT_VAR) u8PDO;     /**<  IO 初值电平 0 low 1 high 2 not care           @brief Pad Data Output */
+        VAR(uint8,                  PORT_VAR) u8PDDir;   /**<  IO方向   0 in 1 out  2 inout             @brief Pad Data Direction */
+        VAR(boolean,                PORT_VAR) bGPIO;     /**<  gpio 初始模式                  @brief GPIO initial mode*/
+        VAR(boolean,                PORT_VAR) bDC;       /**<  方向是否可变，不可用                  @brief Direction changebility*/
+        VAR(boolean,                PORT_VAR) bMC;       /**<  模式是否可变                  @brief Mode changebility*/
     } Port_Siul2_PinConfigType;
 
     static CONST(Port_Siul2_PinConfigType, PORT_CONST) Port_aPinConfigDefault[PORT_MAX_CONFIGURED_PADS_U16]=
@@ -23,3 +27,150 @@
 }
 \end{lstlisting}
 
+\subsubsection{\lstinline{Port_au16PinDescription}}
+各管脚支持的复用模式汇总如下，每个管脚是否支持某一种复用功能，都可以通过算法算出。
+
+\begin{lstlisting}[language=C,style=C]
+    /* 每一行包括一种复用模式，263 个管脚每16个一组，分布在17个组中 */
+    CONST (uint16, PORT_CONST) Port_au16PinDescription[24][17] = {};
+\end{lstlisting}
+
+支持的24中复用模式为：
+\begin{lstlisting}[language=C,style=C]
+    /* 所有管脚可用的模式都隶属于24种复用模式的其中一种，详见 Port_Cfg.h 文件中*/
+/** @brief Port GPIO Mode */
+#define PORT_GPIO_MODE                  ((Port_PinModeType)0)
+/** @brief Port Alternate 1 Mode */
+#define PORT_ALT1_FUNC_MODE             ((Port_PinModeType)1)
+/** @brief Port Alternate 2 Mode */
+#define PORT_ALT2_FUNC_MODE             ((Port_PinModeType)2)
+/** @brief Port Alternate 3 Mode */
+#define PORT_ALT3_FUNC_MODE             ((Port_PinModeType)3)
+/** @brief Port Alternate 4 Mode */
+#define PORT_ALT4_FUNC_MODE             ((Port_PinModeType)4)
+/** @brief Port Alternate 5 Mode */
+#define PORT_ALT5_FUNC_MODE             ((Port_PinModeType)5)
+/** @brief Port Alternate 6 Mode */
+#define PORT_ALT6_FUNC_MODE             ((Port_PinModeType)6)
+/** @brief Port Alternate 7 Mode */
+#define PORT_ALT7_FUNC_MODE             ((Port_PinModeType)7)
+/** @brief Port Output Only Mode */
+#define PORT_ONLY_OUTPUT_MODE           ((Port_PinModeType)8)
+/** @brief Port Input Only Mode */
+#define PORT_ONLY_INPUT_MODE            ((Port_PinModeType)9)
+/** @brief Port Analog input Mode */
+#define PORT_ANALOG_INPUT_MODE          ((Port_PinModeType)10)
+/** @brief Port Input 1 Mode*/
+#define PORT_INPUT1_MODE                ((Port_PinModeType)11)
+/** @brief Port Input 2 Mode*/
+#define PORT_INPUT2_MODE                ((Port_PinModeType)12)
+/** @brief Port Input 3 Mode*/
+#define PORT_INPUT3_MODE                ((Port_PinModeType)13)
+/** @brief Port Input 4 Mode*/
+#define PORT_INPUT4_MODE                ((Port_PinModeType)14)
+/** @brief Port Input 5 Mode*/
+#define PORT_INPUT5_MODE                ((Port_PinModeType)15)
+/** @brief Port Input 6 Mode*/
+#define PORT_INPUT6_MODE                ((Port_PinModeType)16)
+/** @brief Port Input/Output 1 Mode */
+#define PORT_INOUT1_MODE                ((Port_PinModeType)17)
+/** @brief Port Input/Output 2 Mode */
+#define PORT_INOUT2_MODE                ((Port_PinModeType)18)
+/** @brief Port Input/Output 3 Mode */
+#define PORT_INOUT3_MODE                ((Port_PinModeType)19)
+/** @brief Port Input/Output 4 Mode */
+#define PORT_INOUT4_MODE                ((Port_PinModeType)20)
+/** @brief Port Input/Output 5 Mode */
+#define PORT_INOUT5_MODE                ((Port_PinModeType)21)
+/** @brief Port Input/Output 6 Mode */
+#define PORT_INOUT6_MODE                ((Port_PinModeType)22)
+/** @brief Port Input/Output 7 Mode */
+#define PORT_INOUT7_MODE                ((Port_PinModeType)23)
+\end{lstlisting}
+
+\subsubsection{\lstinline{Port_aPadFunctInMuxSettings}}
+该变量保存了各个管脚支持的输入复用模式，及其 \lstinline{IMCR[SSS]}值。需要注意的是，INMUX reg 的 offset 是512。所以真实的 reg 是结构体中的值加上 512。
+
+\begin{lstlisting}[language=C,style=C]
+CONST(Port_InMuxSettingType,PORT_CONST) Port_aPadFunctInMuxSettings[415]=
+{
+
+  /* INMUX settings for pad not available:  */
+  { NO_INPUTMUX_U16, 0U},
+  /* INMUX settings for pad PORT0:      {INMUX reg, PADSEL val} reg offset = 512*/
+  /* EMIOS0_E0UC_0_X_IN input func */
+  {0U, 2U}, 
+  /* EMIOS0_E0UC_13_H_IN input func */
+  {13U, 2U}, 
+  /* FlexCAN_1_RX input func */
+  {189U, 1U}, 
+  /* INMUX settings for pad PORT1:      {INMUX reg, PADSEL val} */
+  /* EMIOS0_E0UC_1_G_IN input func */
+  {1U, 2U}, 
+  /* FlexCAN_3_RX input func */
+  {191U, 1U}, 
+  /* INMUX settings for pad PORT2:      {INMUX reg, PADSEL val} */
+  /* EMIOS0_E0UC_2_G_IN input func */
+  {2U, 2U}, 
+}
+\end{lstlisting}
+
+\subsubsection{\lstinline{Port_au16PadFunctInMuxIndex}}
+
+每一个元素为一个输入管脚在 \lstinline{Port_aPadFunctInMuxSettings} 中的索引，但该索引不是直接对应的，而需要通过一定便宜运算：
+
+\begin{lstlisting}[language=C,style=C]
+#define PORT_INPUT1_MODE                ((Port_PinModeType)11)
+
+index_in_Port_aPadFunctInMuxSettings = (index_in_Port_au16PadFunctInMuxIndex + PinMode) - PORT_INPUT1_MODE;
+\end{lstlisting}
+
+如 \lstinline{pad0} 在 \lstinline{Port_au16PadFunctInMuxIndex}中 \lstinline{index} 为 1，则对应 \lstinline{Port_aPadFunctInMuxSettings} 的第 \lstinline{(1 + PinMode) - 11}项。
+
+该变量即明确的将当前所有管脚使用的复用功能从 \lstinline{Port_aPadFunctInMuxSettings} 选择一种，进行唯一确定。
+\begin{lstlisting}[language=C,style=C]
+CONST(uint16,PORT_CONST) Port_au16PadFunctInMuxIndex[264]=
+{
+
+  /* Index to address the input settings for pad 0*/
+  (uint16)1, 
+  /* Index to address the input settings for pad 1*/
+  (uint16)4, 
+  /* Index to address the input settings for pad 2*/
+  (uint16)6, 
+  /* Index to address the input settings for pad 3*/
+  (uint16)7, 
+
+ } 
+\end{lstlisting}
+
+\subsubsection{\lstinline{Port_aPadFunctInoutMuxSettings}}
+该变量保存了各个管脚支持的输入输出复用模式。
+
+\begin{lstlisting}[language=C,style=C]
+CONST(Port_InoutSettingType,PORT_CONST) Port_aPadFunctInoutMuxSettings[PORT_INOUT_TABLE_NUM_ENTRIES_U16] = 
+{
+
+  /* Inout settings for pad PORT0:      {MSCR pcr number, MODE 复用模式, INMUX reg IMCR REG offset 512, PADSEL val} */
+  /* EMIOS0_E0UC_0_X_IN_OUT input func */
+  {0U, 17U, 0U, 2U}, 
+  /* EMIOS0_E0UC_13_H_IN_OUT input func */
+  {0U, 19U, 13U, 2U}, 
+  /* Inout settings for pad PORT1:      {MSCR, MODE, INMUX reg, PADSEL val} */
+  /* EMIOS0_E0UC_1_G_IN_OUT input func */
+  {1U, 17U, 1U, 2U}, 
+  /* Inout settings for pad PORT2:      {MSCR, MODE, INMUX reg, PADSEL val} */
+  /* EMIOS0_E0UC_2_G_IN_OUT input func */
+  {2U, 17U, 2U, 2U}, 
+  /* Inout settings for pad PORT3:      {MSCR, MODE, INMUX reg, PADSEL val} */
+  /* EMIOS0_E0UC_3_G_IN_OUT input func */
+}
+
+\end{lstlisting}
+
+\subsubsection{\lstinline{Port_aPadSelConfigDefault}}
+该变量实际存储了复用管脚的 \lstinline{IMCR} 寄存器的配置值，非 \lstinline{0xFFFFFFFFU} 值代表含有复用功能。并在 \lstinline{Port_Siul2_Init}中进行初始化。
+
+\begin{lstlisting}[language=C,style=C]
+static CONST(Port_Siul2_PadSelConfigType, PORT_CONST) Port_aPadSelConfigDefault[PORT_NMBR_INMUX_REGS_U16] = {};
+\end{lstlisting}
