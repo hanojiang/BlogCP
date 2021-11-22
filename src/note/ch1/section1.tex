@@ -1,1 +1,25 @@
 \section{Port}
+
+\subsection{数据类型定义}
+
+\begin{lstlisting}[language=C,style=C]
+    typedef struct
+    {
+        VAR(Port_InternalPinIdType, PORT_VAR) u16SIUPin; /**< @brief Pin Defined on Part SIUx */
+        VAR(uint32,                 PORT_VAR) u32MSCR;   /**< @brief Pad Control Register */
+    #if defined(IPV_SIUL2_ODC_SUPPORT_U8)
+        VAR(uint32,                 PORT_VAR) u32ODC;    /**< @brief Pad Output Driver Control Configuration */
+    #endif /* defined(IPV_SIUL2_ODC_SUPPORT_U8) */
+        VAR(uint8,                  PORT_VAR) u8PDO;     /**< @brief Pad Data Output */
+        VAR(uint8,                  PORT_VAR) u8PDDir;   /**< @brief Pad Data Direction */
+        VAR(boolean,                PORT_VAR) bGPIO;     /**< @brief GPIO initial mode*/
+        VAR(boolean,                PORT_VAR) bDC;       /**< @brief Direction changebility*/
+        VAR(boolean,                PORT_VAR) bMC;       /**< @brief Mode changebility*/
+    } Port_Siul2_PinConfigType;
+
+    static CONST(Port_Siul2_PinConfigType, PORT_CONST) Port_aPinConfigDefault[PORT_MAX_CONFIGURED_PADS_U16]=
+{
+    {(Port_InternalPinIdType)137, (uint32)0x00400000, (uint8)2, (uint8)0, (boolean)FALSE, (boolean)FALSE, (boolean)FALSE}
+}
+\end{lstlisting}
+
