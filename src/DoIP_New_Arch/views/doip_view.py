@@ -140,6 +140,8 @@ class MainView(QMainWindow):
         self._ui.projectSelectCcomboBox.currentIndexChanged.connect(self.__on_projectSelectCcomboBox_changed)
         self._ui.prjSelectComboBox.currentIndexChanged.connect(self.__on_genTabPrjSelectCcomboBox_changed)
 
+        self._ui.funcAddressRadioButton.toggled.connect(self.__on_funcAddressRadioButton_toggled)
+
         self._model.sig_testerIpAddresslineEdit_changed.connect(self.__on_testerIpAddresslineEdit_changed)
         self._model.sig_diagMsgSendButton_changed.connect(self.__set_pushbutton_status)
         self._model.sig_InfoPrintBrowser_changed.connect(self.__on_InfoPrintBrowser_changed)
@@ -156,9 +158,23 @@ class MainView(QMainWindow):
         # tableView 添加具体的右键菜单
         self._ui.DiagMsgPrintBrowser.addAction(msgClearOption)
 
+    @Slot(bool)
+    def __on_funcAddressRadioButton_toggled(self, status):
+        logging.debug('func address is {}'.format(status))
+        self._model.ecu_func_address_flag = status
+
+
     def get_ecu_logical_address(self):
-        ecuIndex = self._ui.ecuSeclectBox.currentIndex()
-        ecuLogicAddress = self._model.get_ecu_logical_address_by_index(ecuIndex, self._ui.projectSelectCcomboBox.currentText())
+
+        logging.debug('ecu func address flag is {}'.format(self._model.ecu_func_address_flag))
+        if self._model.ecu_func_address_flag:
+            ecuLogicAddress = self._model.ecu_func_address
+            pass
+        else:
+            ecuIndex = self._ui.ecuSeclectBox.currentIndex()
+            ecuLogicAddress = self._model.get_ecu_logical_address_by_index(ecuIndex, self._ui.projectSelectCcomboBox.currentText())
+
+        logging.debug('input ecu address is 0x{:x}'.format(ecuLogicAddress))
         return ecuLogicAddress
 
     def get_test_can_name(self):

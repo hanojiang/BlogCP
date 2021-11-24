@@ -19,6 +19,15 @@ class Model(QObject):
         self._tester_ip_address = '172.31.7.88'
         self._tester_logical_address = 0x0e80
         self.load_project_from_json('./xml_generate/project.json')
+        self._ecu_func_address = 0xefff
+        self._ecu_func_address_flag = False
+
+    @property
+    def ecu_func_address(self):
+        return self._ecu_func_address
+    @property
+    def ecu_func_address_flag(self):
+        return self._ecu_func_address_flag
 
     @property
     def ecu_ip_address(self):
@@ -35,6 +44,14 @@ class Model(QObject):
     @property
     def tester_logical_address(self):
         return self._tester_logical_address
+
+    @ecu_func_address.setter
+    def ecu_func_address(self, address):
+        self._ecu_func_address = address
+
+    @ecu_func_address_flag.setter
+    def ecu_func_address_flag(self, flag):
+        self._ecu_func_address_flag = flag
 
     @ecu_ip_address.setter
     def ecu_ip_address(self, ecu_ip):
@@ -160,7 +177,7 @@ class Model(QObject):
         for project_name, project_info in self.all_projects_info.items():
             for node in project_info:
                 node['LOGICAL_ADD'] = int(node['LOGICAL_ADD'], 16)
-                node['CAN_FD'] = bool(node['CAN_FD'])
+                node['CAN_FD'] = 'True'==node['CAN_FD'] #bool(node['CAN_FD'])
 
     def get_all_node(self, project):
 
