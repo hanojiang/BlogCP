@@ -133,6 +133,24 @@ block在满足以下条件后，writeall 阶段可写入NV Block。
   目前的理解是，NVM 模块通过内部的 CRC buffer 存储 block 的 CRC 值，并在 \lstinline{NVM_ReadAll} 阶段，验证 Ram block 的 CRC值是否一致，一致时避免从NV 中读数据。
 \end{remark}
 
+NvMCalcRamBlockCrc 配置影响下的处理流程，如下图所示：
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.35]{pic/NVM_cal_ram_crc.png}
+  \caption{NvMCalcRamBlockCrc 处理流程}
+  \label{fig:NVM_cal_ram_crc}
+\end{figure}
+
+对于某些 NVRAM 块，可能需要在 \lstinline{NvM_ReadAll} 期间保护相应 RAM 块的数据内容不被覆盖，以防存储在相应 NV 块中的数据比 RAM 块中的数据更旧。例如以下场景，当 RAM 中的数据尚未写入 NV 存储器时热复位。
+在这种情况下，RAM 块必须分配在复位安全（不经历初始化）的 RAM 区域中，并且配置参数 CalcRamBlockCrc 必须设置为 \lstinline{TRUE}。 这意味着相应的 NV 块也具有/具有 CRC 配置，并且参数 \lstinline{NvMSetRamBlockStatus} Api 必须设置为值 \lstinline{TRUE} 。
+
+每次更改 RAM 块数据内容后，必须为相应的 NVRAM 块调用 API \lstinline{NvMSetRamBlockStatus} ，并将参数 \lstinline{BlockChanged} 设置为 \lstinline{TRUE} 。然后，NVM 将重新计算此 RAM 块的 CRC，并将结果存储在分配在复位安全（不经历初始化）RAM 区域中的内部变量中。
+作为此 NVRAM 块的先决条件，必须配置有效的永久 RAM 块 (NvMRamBlockDataAddress) 或显式同步回调函数 (NvMReadRamBlockFromNvM)。
+
+在每次启动 (\lstinline{NvM_ReadAll}) 期间，NvM 模块都会计算此类 RAM 块的 CRC，如果它与存储的 CRC 值匹配，则不会覆盖 RAM 块。如果计算出的 CRC 与存储的 CRC 不匹配，RAM 块将被从 NV 块读取的数据覆盖，或者，如果此读取尝试失败，
+使用默认数据恢复（如果通过参数 NvMRomBlockDataAddress 或参数 NvMInitBlockCallback 配置）。
+
 \subsubsection{NvMBlockUseCrc}
 block是否使用CRC。
 
